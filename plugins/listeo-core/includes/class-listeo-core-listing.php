@@ -302,12 +302,10 @@ class Listeo_Core_Listing {
 		 	}
 		 	
         }
-     	
+     
 		$available_query_vars = Listeo_Core_Search::build_available_query_vars();
 		$meta_queries = array();
-		if(!$args['featured']) {
-			$available_query_vars[] = 'featured';
-		}
+		$available_query_vars[] = 'featured';
 
 			
 		foreach ($available_query_vars as $key => $meta_key) {
@@ -377,9 +375,7 @@ class Listeo_Core_Listing {
 					
 					$meta = $args[$meta_key];
 				}
-
 				if ( $meta ) {
-					
 					if($meta === 'featured') {
 						$query_args['meta_query'][] = array(
 			                'key'     => '_featured',
@@ -395,22 +391,12 @@ class Listeo_Core_Listing {
 					}
 					
 				}
-				
 			}
-
-			
 			
 			
 
 		}
-		if($args['featured'] == true) {
-			$query_args['meta_query'][] = array(
-	                'key'     => '_featured',
-					'value'   => 'on',
-					'compare' => '='
-	            );	
-		}
-		
+
     	if( isset($ordering_args['meta_key']) && $ordering_args['meta_key'] == '_featured' ){
 
 			$query_args['meta_query'][] = array(
@@ -438,7 +424,7 @@ class Listeo_Core_Listing {
 		if ( empty( $query_args['meta_query'] ) )
 			unset( $query_args['meta_query'] );
 
-		
+	
 		
 		$query_args = apply_filters( 'realto_get_listings', $query_args, $args );
 		
@@ -497,6 +483,46 @@ class Listeo_Core_Listing {
 
 	}
 
+	public static function get_listing_regular_price( $post ) {
+
+		// Use global post ID if not defined
+
+		if ( ! $post ) {
+			$post = get_the_ID();
+		} else {
+			$post = $post->ID;
+		}
+
+		$price = get_post_meta( $post, '_normal_price', true );
+		if (is_numeric($price)) {
+		    $price_raw = number_format_i18n($price);
+		} else {
+		    return $price;
+		}
+
+		$price_output = '';
+		if ( !empty( $price_raw ) ) :
+			
+ 			$currency_abbr = get_option( 'listeo_currency' );
+			$currency_postion = get_option( 'listeo_currency_postion' );
+			$currency_symbol = Listeo_Core_Listing::get_currency_symbol($currency_abbr);
+
+			/*if($currency_postion == 'after') {
+				$price_output = esc_html__('Price ','listeo_core') .$price_raw . $currency_symbol;
+			} else {
+				$price_output = esc_html__('Price ','listeo_core') .$currency_symbol.$price_raw;
+			}*/
+			if($currency_postion == 'after') {
+				$price_output = $price_raw . $currency_symbol;
+			} else {
+				$price_output = $currency_symbol.$price_raw;
+			}
+
+		endif;
+		// Return listing price
+		return apply_filters( 'get_listing_price', $price_output, $post );
+
+	}
 
 	public static function get_listing_price_range( $post ){
 		if ( ! $post ) {

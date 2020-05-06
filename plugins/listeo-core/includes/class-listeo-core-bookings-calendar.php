@@ -97,7 +97,6 @@ class Listeo_Core_Bookings_Calendar {
         // filter by parameters from args
         $WHERE = '';
         $FILTER_CANCELLED = "AND NOT status='cancelled' ";
-
         if ( is_array ($args) )
         {
             foreach ( $args as $index => $value ) 
@@ -108,21 +107,15 @@ class Listeo_Core_Bookings_Calendar {
 
                 if ( $value == 'approved' ){ 
                     $WHERE .= " AND ( (`$index` = 'confirmed') OR (`$index` = 'paid') )";
-                } elseif ( $value == 'icalimports' ) { 
-
                 } else {
-                    $WHERE .= " AND (`$index` = '$value')";  
+                  $WHERE .= " AND (`$index` = '$value')";  
                 } 
                 if( $value == 'cancelled' || $value == 'special_price'){
                     $FILTER_CANCELLED = '';
                 }
-                if( $value == 'icalimports'){
-                    $FILTER_CANCELLED = "AND NOT status='icalimports' ";
-                }
             
             }
         }
-
         if($all == 'users'){
             $FILTER = "AND NOT comment='owner reservations'";
         } else if( $all == 'owner') {
@@ -130,12 +123,11 @@ class Listeo_Core_Bookings_Calendar {
         } else {
             $FILTER = '';
         }
-        
 
         if ( $limit != '' ) $limit = " LIMIT " . esc_sql($limit);
         
         if ( is_numeric($offset)) $offset = " OFFSET " . esc_sql($offset);
-
+        
         switch ($by)
         {
 
@@ -344,8 +336,8 @@ class Listeo_Core_Bookings_Calendar {
          }
         // get listing type
         $listing_type = get_post_meta ( $listing_id, '_listing_type', true );
-     
-        
+        $listing_type = $listing_type[0];
+
          // default we have one free place
          $free_places = 1;
 
@@ -378,15 +370,7 @@ class Listeo_Core_Bookings_Calendar {
          } else if ( $listing_type == 'service' && ! $_slots )  {
 
              // if there are no slots then always is free place and owner menage himself
-
-            // check for imported icals
-            $result = self :: get_bookings( $date_start, $date_end, array( 'listing_id' => $listing_id, 'type' => 'reservation' ) );
-            if(!empty($result)) {
-                return 0; 
-            } else {
-                return 1;
-            }
-
+             return 1;
 
          }
 
@@ -430,11 +414,8 @@ class Listeo_Core_Bookings_Calendar {
         } else {
             $slot = $_POST['slot'];
         }
-        if(isset($_POST['hour'])){
-            $ajax_out['free_places'] = 1;
-        } else {
-            $ajax_out['free_places'] = self :: count_free_places( $_POST['listing_id'], $_POST['date_start'], $_POST['date_end'], $slot );    
-        }
+        $ajax_out['free_places'] = self :: count_free_places( $_POST['listing_id'], $_POST['date_start'], $_POST['date_end'], $slot );
+        
         $multiply = 1;
         if(isset($_POST['adults'])) $multiply = $_POST['adults'];
         if(isset($_POST['tickets'])) $multiply = $_POST['tickets'];
@@ -458,33 +439,15 @@ class Listeo_Core_Bookings_Calendar {
         $services_price = 0;
         if(isset($_POST['services'])){
             $services = $_POST['services'];
-            if(isset($services) && !empty($services)){
-
-                $bookable_services = listeo_get_bookable_services($listing_id);
-                $countable = array_column($services,'value');
-        
-                $i = 0;
-                foreach ($bookable_services as $key => $service) {
-                    
-                    if(in_array(sanitize_title($service['name']),array_column($services,'service'))) { 
-                        //$services_price += (float) preg_replace("/[^0-9\.]/", '', $service['price']);
-                        $services_price +=  listeo_calculate_service_price($service, $tickets, 1, $countable[$i] );
-                       
-                       $i++;
-                    }
-                   
-                
-                } 
-            }
-            // $bookable_services = listeo_get_bookable_services($listing_id);
-            //  $i = 0;
-            //  foreach ($bookable_services as $key => $service) {
-            //     $i++;
-            //     if(in_array('service_'.$i,$services)) {
-            //       $services_price += (float) preg_replace("/[^0-9\.]/", '', $service['price']);
+            $bookable_services = listeo_get_bookable_services($listing_id);
+             $i = 0;
+             foreach ($bookable_services as $key => $service) {
+                $i++;
+                if(in_array('service_'.$i,$services)) {
+                  $services_price += (float) preg_replace("/[^0-9\.]/", '', $service['price']);
                   
-            //     }
-            //  } 
+                }
+             } 
         }
         $ajax_out['price'] = ($normal_price * $tickets) + $reservation_price + $services_price;
         wp_send_json_success( $ajax_out );
@@ -669,7 +632,7 @@ class Listeo_Core_Bookings_Calendar {
     * @param  array $args list of parameters
     *
     */
-    public static function insert_booking( $args )  {
+    private static function insert_booking( $args )  {
 
         global $wpdb;
         
@@ -719,7 +682,7 @@ class Listeo_Core_Bookings_Calendar {
         
         $owner_info = get_userdata( $owner_id );
         $comment = json_decode($booking_data['comment']);
-
+        listeo_write_log($owner_info);
         // only one time clicking blocking
         if ( $booking_data['status'] == $status ) return;
         
@@ -759,13 +722,7 @@ class Listeo_Core_Bookings_Calendar {
 
                 // calculate when listing will be expired when will bo not pays
                 $expired_after = get_post_meta( $booking_data['listing_id'], '_expired_after', true);
-                if(empty($expired_after)) {
-                    $expired_after = 48;
-                }
-                if(!empty($expired_after) && $expired_after > 0){
-                    $expiring_date = date( "Y-m-d H:i:s", strtotime('+'.$expired_after.' hours') );    
-                }
-                
+                $expiring_date = date( "Y-m-d H:i:s", strtotime('+'.$expired_after.' hours') );
 
                 //
                 $instant_booking = get_post_meta( $booking_data['listing_id'], '_instant_booking', true);
@@ -849,10 +806,7 @@ class Listeo_Core_Bookings_Calendar {
                 $order->set_address( $address, 'shipping' );
                 $order->set_customer_id($user_id);
                 $order->set_billing_email( $email );
-                if(isset($expiring_date)){
-                    $order->set_date_paid( strtotime( $expiring_date ) );    
-                }
-                
+                $order->set_date_paid( strtotime( $expiring_date ) );
                 
 
 
@@ -874,9 +828,7 @@ class Listeo_Core_Bookings_Calendar {
                 $order->save_meta_data();
 
                 $update_values['status'] = 'confirmed';
-                if(isset($expiring_date)){
-                    $update_values['expiring'] = $expiring_date;
-                }
+                $update_values['expiring'] = $expiring_date;
                 $update_values['order_id'] = $order->get_order_number();
                 
                 
@@ -1058,7 +1010,6 @@ class Listeo_Core_Bookings_Calendar {
         // get all special prices between two dates from listeo settings special prices
         $special_prices_results = self :: get_bookings( $date_start, $date_end, array( 'listing_id' => $listing_id, 'type' => 'special_price' ) );
 
-        
 
         // prepare special prices to nice array
         foreach ($special_prices_results as $result) 
@@ -1075,35 +1026,27 @@ class Listeo_Core_Bookings_Calendar {
         }
         $reservation_price  =  (float) get_post_meta ( $listing_id, '_reservation_price', true);
         $_count_per_guest  = get_post_meta ( $listing_id, '_count_per_guest', true);
-        $services_price = 0;
+
         $listing_type = get_post_meta( $listing_id, '_listing_type', true);
         if($listing_type == 'event'){
             if(isset($services) && !empty($services)){
                 $bookable_services = listeo_get_bookable_services($listing_id);
-                $countable = array_column($services,'value');
-              
-                $i = 0;
-                foreach ($bookable_services as $key => $service) {
-                    
-                    if(in_array(sanitize_title($service['name']),array_column($services,'service'))) { 
-                        //$services_price += (float) preg_replace("/[^0-9\.]/", '', $service['price']);
-                        $services_price +=  listeo_calculate_service_price($service, $multiply, 1, $countable[$i] );
-                        
-                       $i++;
+                 $i = 0;
+                 foreach ($bookable_services as $key => $service) {
+                    $i++;
+                    if(in_array('service_'.$i,$services)) {
+                      $reservation_price += (float) preg_replace("/[^0-9\.]/", '', $service['price']);
+                      
                     }
-                   
-                
-                } 
+                 } 
             }
-            return $services_price+$reservation_price+$normal_price*$multiply;
+            return $reservation_price+$normal_price*$multiply;
         }
         // prepare dates for loop
 
         $firstDay = new DateTime( $date_start );
         $lastDay = new DateTime( $date_end . '23:59:59') ;
 
-        $days_between = $lastDay->diff($firstDay)->format("%a");
-        $days_count = ($days_between == 0) ? 1 : $days_between ;
         //fix for not calculating last day of leaving
         if ( $date_start != $date_end ) $lastDay -> modify('-1 day');
         
@@ -1145,22 +1088,15 @@ class Listeo_Core_Bookings_Calendar {
         $services_price = 0;
         if(isset($services) && !empty($services)){
             $bookable_services = listeo_get_bookable_services($listing_id);
-            $countable = array_column($services,'value');
-          
-            $i = 0;
-            foreach ($bookable_services as $key => $service) {
-                
-                if(in_array(sanitize_title($service['name']),array_column($services,'service'))) { 
-                    //$services_price += (float) preg_replace("/[^0-9\.]/", '', $service['price']);
-                    $services_price +=  listeo_calculate_service_price($service, $multiply, $days_count, $countable[$i] );
-                    
-                   $i++;
+             $i = 0;
+             foreach ($bookable_services as $key => $service) {
+                $i++;
+                if(in_array('service_'.$i,$services)) {
+                  $services_price += (float) preg_replace("/[^0-9\.]/", '', $service['price']);
+                  
                 }
-               
-            
-            } 
+             } 
         }
-        
         $price += $reservation_price + $services_price;
 
         $endprice = round($price,2);
@@ -1229,7 +1165,6 @@ class Listeo_Core_Bookings_Calendar {
             $_user_id = get_current_user_id();
           
             $data = json_decode( wp_unslash(htmlspecialchars_decode(wp_unslash($_POST['value']))), true );
-            
             $error = false;
             
             $services = (isset($data['services'])) ? $data['services'] : false ;
@@ -1238,59 +1173,25 @@ class Listeo_Core_Bookings_Calendar {
                 $currency_abbr = get_option( 'listeo_currency' );
                 $currency_postion = get_option( 'listeo_currency_postion' );
                 $currency_symbol = Listeo_Core_Listing::get_currency_symbol($currency_abbr);
-                //$comment_services = '<ul>';
-                $comment_services = array();
+                $comment_services = '<ul>';
                 $bookable_services = listeo_get_bookable_services( $data['listing_id'] );
-                
-                $firstDay = new DateTime( $data['date_start'] );
-                $lastDay = new DateTime( $data['date_start'] . '23:59:59') ;
-
-                $days_between = $lastDay->diff($firstDay)->format("%a");
-                $days_count = ($days_between == 0) ? 1 : $days_between ;
-
-                //since 1.3 change comment_service to json
-                $countable = array_column($services,'value');
-                if(isset($data['adults'])){
-                    $guests = $data['adults'];
-                } else if(isset($data['tickets'])){
-                    $guests = $data['tickets'];
-                } else {
-                    $guests = 1;
-                }
                 $i = 0;
                 foreach ($bookable_services as $key => $service) {
-                    
-                    if(in_array(sanitize_title($service['name']),array_column($services,'service'))) { 
-                        //$services_price += (float) preg_replace("/[^0-9\.]/", '', $service['price']);
-                        $comment_services[] =  array(
-                            'service' => $service, 
-                            'guests' => $data['adults'], 
-                            'days' => $days_count, 
-                            'countable' =>  $countable[$i],
-                            'price' => listeo_calculate_service_price($service, $data['adults'], $days_count, $countable[$i] ) 
-                        );
-                        
-                       $i++;
+                    $i++;
+                    if(in_array('service_'.$i,$services)) {
+                        $comment_services .= '<li>'.$service['name'].'<span class="services-list-price-tag">';
+                        if(empty($service['price']) || $service['price'] == 0) {
+                            $comment_services .= esc_html__('Free','listeo_core');
+                        } else {
+                            if($currency_postion == 'before') {  $comment_services .= $currency_symbol.' '; } 
+                            $comment_services .= $service['price'];
+                            if($currency_postion == 'after') { $comment_services .= ' '.$currency_symbol; } 
+                        }                        
+                        $comment_services .= '</span></li>';
+
                     }
-                   
-                
                 } 
-
-                    // $i++;
-                    // if(in_array('service_'.$i,$services)) {
-                    //     $comment_services .= '<li>'.$service['name'].'<span class="services-list-price-tag">';
-                    //     if(empty($service['price']) || $service['price'] == 0) {
-                    //         $comment_services .= esc_html__('Free','listeo_core');
-                    //     } else {
-                    //         if($currency_postion == 'before') {  $comment_services .= $currency_symbol.' '; } 
-                    //         $comment_services .= $service['price'];
-                    //         if($currency_postion == 'after') { $comment_services .= ' '.$currency_symbol; } 
-                    //     }                        
-                    //     $comment_services .= '</span></li>';
-
-                    // }
-                 
-                //$comment_services .= '</ul>';
+                $comment_services .= '</ul>';
             }
             $listing_meta = get_post_meta ( $data['listing_id'], '', true );
             // detect if website was refreshed
@@ -1317,10 +1218,10 @@ class Listeo_Core_Bookings_Calendar {
 
             $listing_owner = get_post_field( 'post_author', $data['listing_id'] );
 
-            $billing_address_1 = (isset($_POST['billing_address_1'])) ? $_POST['billing_address_1'] : false ;
-            $billing_postcode = (isset($_POST['billing_postcode'])) ? $_POST['billing_postcode'] : false ;
-            $billing_city = (isset($_POST['billing_city'])) ? $_POST['billing_city'] : false ;
-            $billing_country = (isset($_POST['billing_country'])) ? $_POST['billing_country'] : false ;
+             $billing_address_1 = (isset($_POST['billing_address_1'])) ? $_POST['billing_address_1'] : false ;
+             $billing_postcode = (isset($_POST['billing_postcode'])) ? $_POST['billing_postcode'] : false ;
+             $billing_city = (isset($_POST['billing_city'])) ? $_POST['billing_city'] : false ;
+             $billing_country = (isset($_POST['billing_country'])) ? $_POST['billing_country'] : false ;
                         
 
             switch ( $listing_meta['_listing_type'][0] ) 
@@ -1381,7 +1282,7 @@ class Listeo_Core_Bookings_Calendar {
                             $multiply = 1;
                             if(isset($data['adults'])) $multiply = $data['adults'];
 
-                            $price = self :: calculate_price( $data['listing_id'], $data['date_start'], $data['date_end'], $multiply, $services   );
+                            $price = self :: calculate_price( $data['listing_id'], $data['date_start'], $data['date_end'], $multiply,$services   );
                         } else {
                             $price = self :: calculate_price( $data['listing_id'], $data['date_start'], $data['date_end'], 1, $services  );
                         }
@@ -1428,7 +1329,7 @@ class Listeo_Core_Bookings_Calendar {
 
                     $status = apply_filters( 'listeo_service_default_status', 'waiting');
                     if($instant_booking == 'check_on' || $instant_booking == 'on') { $status = 'confirmed'; }
-                    // time picker booking
+                    // when we dealing with opening hours
                     if ( ! isset( $data['slot'] ) ) 
                     {
                         $count_per_guest = get_post_meta($data['listing_id'], "_count_per_guest" , true ); 
@@ -1443,14 +1344,12 @@ class Listeo_Core_Bookings_Calendar {
                         } else {
                             $price = self :: calculate_price( $data['listing_id'], $data['date_start'], $data['date_end'] ,1, $services );
                         }
-                       
-                        $hour_end = ( isset($data['_hour_end']) && !empty($data['_hour_end']) ) ? $data['_hour_end'] : $data['_hour'] ;
 
                         $booking_id = self :: insert_booking ( array (
                             'owner_id' => $listing_owner,
                             'listing_id' => $data['listing_id'],
                             'date_start' => $data['date_start'] . ' ' . $data['_hour'] . ':00',
-                            'date_end' => $data['date_end'] . ' ' . $hour_end . ':00',
+                            'date_end' => $data['date_end'] . ' ' . $data['_hour'] . ':00',
                             'comment' =>  json_encode ( array( 'first_name' => $_POST['firstname'],
                                 'last_name' => $_POST['lastname'],
                                 'email' => $_POST['email'],
@@ -1589,8 +1488,6 @@ class Listeo_Core_Bookings_Calendar {
             return;
         } 
 
-        // not confirmed yet
-
 
         // extra services
         $data = json_decode( wp_unslash( $_POST['value'] ), true );
@@ -1609,9 +1506,6 @@ class Listeo_Core_Bookings_Calendar {
 
         } else if ( isset( $data['_hour'] ) ) {
             $hour = $data['_hour'];
-            if(isset($data['_hour_end'])) {
-                $hour_end = $data['_hour_end'];
-            }
         }
         
         $template_loader = new Listeo_Core_Template_Loader;
@@ -1623,23 +1517,18 @@ class Listeo_Core_Bookings_Calendar {
         $count_per_guest = get_post_meta($data['listing_id'],"_count_per_guest",true); 
         //check count_per_guest
 
-      //  if($count_per_guest || $data['listing_type'] == 'event' ){
+        if($count_per_guest || $data['listing_type'] == 'event' ){
 
             $multiply = 1;
             if(isset($data['adults'])) $multiply = $data['adults'];
             if(isset($data['tickets'])) $multiply = $data['tickets'];
 
             $data['price'] = self :: calculate_price( $data['listing_id'], $data['date_start'], $data['date_end'], $multiply, $services   );
-        // } else {
-            
-        //     $data['price'] = self :: calculate_price( $data['listing_id'], $data['date_start'], $data['date_end'], 1, $services  );
-        // }
-
+        } else {
+            $data['price'] = self :: calculate_price( $data['listing_id'], $data['date_start'], $data['date_end'], 1, $services  );
+        }
         if(isset($hour)){
             $data['_hour'] = $hour;
-        }
-        if(isset($hour_end)){
-            $data['_hour_end'] = $hour_end;
         }
 
         $template_loader->set_template_data( $data )->get_template_part( 'booking' ); 

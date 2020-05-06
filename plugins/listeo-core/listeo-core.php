@@ -1,7 +1,7 @@
 <?php
 /*
  * Plugin Name: Listeo-Core - Directory Plugin by Purethemes
- * Version: 1.4.1
+ * Version: 1.3.4
  * Plugin URI: http://www.purethemes.net/
  * Description: Directory & Listings Plugin from Purethemes.net
  * Author: Purethemes.net
@@ -20,6 +20,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 define( 'REALTEO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
 /* load CMB2 for meta boxes*/
 if ( file_exists( dirname( __FILE__ ) . '/lib/cmb2/init.php' ) ) {
 	require_once dirname( __FILE__ ) . '/lib/cmb2/init.php';
@@ -211,7 +212,7 @@ function listeo_core_conversations_db() {
 	  `read_user_1` int(11) NOT NULL,
 	  `read_user_2` int(11) NOT NULL,
 	  `last_update` bigint(20) DEFAULT NULL,
-	  `notification` varchar(20) DEFAULT '',
+	  `notification` bigint(20) DEFAULT NULL,
 	  PRIMARY KEY  (id)
 	) $collate;
 	";
@@ -351,5 +352,52 @@ function listeo_core_missing_cmb2() { ?>
 		<p><?php _e( 'CMB2 Plugin is missing CMB2!', 'listeo_core' ); ?></p>
 	</div>
 <?php }
+
+// custom add woocommerce order 
+add_action('wc_custom_offer_order', 'wc_custom_offer_order_fun',1,2);
+    //function wc_custom_offer_order_fun($user_id,$p_id,$first_name,$last_name,$email,$phone,$address_1,$city,$postcode,$country) {
+    function wc_custom_offer_order_fun($p_id,$user_id) {
+        global $woocommerce;
+        
+        $user_info = get_userdata($user_id);
+        $first_name = $user_info->first_name;
+      	$last_name = $user_info->last_name;
+        $user_email = $user_info->user_email;
+	    
+	    $billing_first_name = get_user_meta( $user_id, 'billing_first_name', true );
+	    $billing_last_name = get_user_meta( $user_id, 'billing_last_name', true );
+	    $billing_address_1 = get_user_meta( $user_id, 'billing_address_1', true );
+	    $billing_city = get_user_meta( $user_id, 'billing_city', true );
+	    $billing_postcode = get_user_meta( $user_id, 'billing_postcode', true );
+	    $billing_country = get_user_meta( $user_id, 'billing_country', true );
+        
+        $billing_address_arr = array(
+            'first_name' => (($billing_first_name !='')?$billing_first_name:$first_name),
+            'last_name'  => (($billing_last_name !='')?$billing_last_name:$last_name),
+            'address_1'  => $billing_address_1,
+            'city'       => $billing_city,
+            'postcode'   => $billing_postcode,
+            'country'    => $billing_country
+        );
+
+        // Now we create the order
+        $order = wc_create_order();
+
+        // The add_product() function below is located in /plugins/woocommerce/includes/abstracts/abstract_wc_order.php
+        $order->add_product( wc_get_product($p_id), 1); // This is an existing SIMPLE product  
+        $order->set_address( $billing_address_arr, 'billing' );
+        $order->set_address( $billing_address_arr, 'shipping' );
+        $order->set_customer_id($user_id);
+        $order->set_billing_email( $user_email );
+        $order->calculate_totals();
+        $order->update_status("Completed");  
+        $order_id = $order->id; 
+    	
+    	$payment_url = $order->get_checkout_payment_url();
+    	$currency_symbol = get_woocommerce_currency_symbol();
+    	$order_details = array('order_id'=>$order_id,'payment_url'=>$payment_url,'currency_symbol'=>$currency_symbol);
+    	
+    	return $order_details;
+    }
 
 Listeo_Core();

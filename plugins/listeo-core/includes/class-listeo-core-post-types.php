@@ -47,7 +47,7 @@ class Listeo_Core_Post_Types {
 
 		add_filter( 'wp_insert_post_data', array( $this, 'default_comments_on' ) );
 		add_action( 'save_post', array( $this,'save_availibilty_calendar'), 1, 3 );
-		add_action( 'save_post', array( $this,'save_as_product'), 10, 3 );
+		add_action( 'wp_insert_post', array( $this,'save_as_product'), 10, 3 );
 
 
 		add_action( 'listeo_core_check_for_expired_listings', array( $this, 'check_for_expired' ) );
@@ -756,7 +756,7 @@ class Listeo_Core_Post_Types {
 			AND postmeta.meta_value < %s
 			AND posts.post_status = 'publish'
 			AND posts.post_type = 'listing'
-		",  current_time( 'timestamp' ) ) );
+		", strtotime(date( $date_format, current_time( 'timestamp' ) ) ) ) );
 
 		if ( $listing_ids ) {
 			foreach ( $listing_ids as $listing_id ) {
@@ -1033,11 +1033,7 @@ class Listeo_Core_Post_Types {
 
 	function add_listings_permastructure() {
 		global $wp_rewrite;
-		$standard_slug = apply_filters( 'listeo_rewrite_listing_slug', 'listing' );
-		$permalinks = Listeo_Core_Post_Types::get_permalink_structure();
-		$slug = (isset($permalinks['listing_base']) && !empty($permalinks['listing_base'])) ? $permalinks['listing_base'] : $standard_slug ;
-		
-
+		$slug = apply_filters( 'listeo_rewrite_listing_slug', 'listing' );
 		add_permastruct( 'region', $slug.'/%region%', false );
 		add_permastruct( 'listing', $slug.'/%region%/%listing%', false );
 	}
@@ -1087,11 +1083,7 @@ class Listeo_Core_Post_Types {
 
 
 	function save_as_product( $post_ID, $post, $update ){
-		if(!is_admin()){
-
-			return;
-		}
-
+		
 		if ($post->post_type == 'listing') {
 
 			

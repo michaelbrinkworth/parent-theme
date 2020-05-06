@@ -1,4 +1,4 @@
-	/* ----------------- Start Document ----------------- */
+  /* ----------------- Start Document ----------------- */
 (function($){
 "use strict";
 
@@ -11,6 +11,27 @@ $(document).ready(function(){
         }
     });
 
+  $("body").on('click','.btn-attachment',function(e){
+    $(this).parent().find('.message-attachment').toggle();
+  });
+
+  $("body").on('click','.choose-file',function(e){
+    $('#fileInput').trigger('click');
+    
+    $('input[type="file"]').change(function(e){
+      /*var fileName = e.target.files[0].name;
+      alert('The file "' + fileName +  '" has been selected.');*/
+      var names = [];
+      for (var i = 0; i < $(this).get(0).files.length; ++i) {
+          names.push($(this).get(0).files[i].name);
+      } 
+      $('.selected-files').text(names);
+    });
+
+  });
+
+  //$('.dashboard-nav ul .active .messages').hide();
+  //$('.dashboard-nav ul .messages').hide();
    // $('.booking-widget').after("<div class='booking-widget-hook'></div>");
    
    //  $(window).on('load resize', function() {
@@ -26,32 +47,32 @@ $(document).ready(function(){
 
       e.preventDefault();
       if($(this).is('.clicked,.liked')){
-      	return;
+        return;
       }
-    	$(this).addClass('clicked');
+      $(this).addClass('clicked');
 
 
-      var post_id 	= $(this).data("post_id"),
-      handler 		= $(this),
-      nonce 			= $(this).data("nonce"),
-      addedtolist 	= $(this).data("saved-title")
+      var post_id   = $(this).data("post_id"),
+      handler     = $(this),
+      nonce       = $(this).data("nonce"),
+      addedtolist   = $(this).data("saved-title")
 
       $.ajax({
         type: 'POST',
         dataType: 'json',
         url: listeo.ajaxurl,
-         data 	: {
+         data   : {
           action: "listeo_core_bookmark_this", 
           post_id : post_id, 
           nonce: nonce
         },
-         success	: function(response) {
+         success  : function(response) {
           console.log(response);
             if(response.type == "success") {
                handler.removeClass('listeo_core-bookmark-it').addClass('liked').addClass('listeo_core-unbookmark-it').removeClass('clicked');
                var confirmed = handler.data('confirm');
                handler.children('.like-icon').addClass('liked').removeClass('clicked').parent().html('<span class="like-icon liked"></span> '+confirmed);
-          	   
+               
             }
             else {
                
@@ -62,8 +83,6 @@ $(document).ready(function(){
       })   
   });
 
-
-  
 
 
   $(".listeo_core-unbookmark-it").on('click', function(e){
@@ -76,8 +95,8 @@ $(document).ready(function(){
           type: 'POST',
           dataType: 'json',
           url: listeo.ajaxurl,
-          data 	: {action: "listeo_core_unbookmark_this", post_id : post_id, nonce: nonce},
-          success	: function(response) {
+          data  : {action: "listeo_core_unbookmark_this", post_id : post_id, nonce: nonce},
+          success : function(response) {
            console.log(handler);
            console.log(response);
             if(response.type == "success") {
@@ -600,124 +619,6 @@ $(document).ready(function(){
 
     });
         
-    function get_url_extension( url ) {
-        return url.split(/\#|\?/)[0].split('.').pop().trim();
-    }
-
-    $('body').on('submit', ".ical-import-form", function(e){
-
-        e.preventDefault();
-
-        $(this).find('button').addClass('loading');
-        $('input.import_ical_url').removeClass('bounce');
-        
-        var form = $(this);
-        var listing_id  = $(this).data('listing-id');
-        var name        = $(this).find('input.import_ical_name').val();
-        var url         = $(this).find('input.import_ical_url').val();
-        var filetype = get_url_extension(url); //validate for .ical, .ics, .ifb, .icalendar
-        
-        var valid_filetypes = [ 'ical', 'ics', 'ifb', 'icalendar', 'calendar' ];
-        
-        if( url.indexOf('calendar') !== -1 || $.inArray( filetype, valid_filetypes ) > -1 ) {
-        
-            $.ajax({
-              type: 'POST', 
-              dataType: 'json',
-              url: listeo.ajaxurl,
-              data: { 
-                  'action': 'add_new_listing_ical', 
-                  'name':   name,
-                  'url':    url,
-                  'listing_id':    listing_id,
-                  //'nonce': nonce
-                 },
-              success: function(data){
-                  
-                if (data.type == 'success'){
-                    
-                    form.find('button').removeClass('loading');
-                    form.find('input.import_ical_name').val('');
-                    form.find('input.import_ical_url').val('');
-                    form.parents('.ical-import-dialog').find('.saved-icals').html(data.output);
-                    $('.ical-import-dialog .notification').removeClass('error notice').addClass('success').show().html(data.notification);
-                
-                }
-                
-                if (data.type == 'error'){
-                  form.find('button').removeClass('loading');
-                  
-                  $('.ical-import-dialog .notification').removeClass('success notice').addClass('error').show().html(data.notification);
-                }
-
-              }
-          });
-        } else {
-          $(this).find('button').removeClass('loading');
-          $('input.import_ical_url').addClass('bounce');
-          window.setTimeout( function(){ $('input.import_ical_url').removeClass('bounce'); }, 1000);
-        }
-      
-
-    });
-
-      
-    $('body').on('click', "a.ical-remove", function(e){
-        e.preventDefault();
-        var $this = $(this),
-        index = $(this).data('remove'),
-        nonce = $(this).data('nonce');
-        var listing_id  = $(this).data('listing-id');
-        $this.parents('.saved-icals').addClass('loading');
-
-        $.ajax({
-            type: 'POST', 
-            dataType: 'json',
-            url: listeo.ajaxurl,
-            data: { 
-                'action':     'add_remove_listing_ical', 
-                'index':      index,
-                'listing_id': listing_id,
-                //'nonce': nonce
-               },
-            success: function(data){
-                
-               if (data.type == 'success'){
-                  $this.parents('.saved-icals').removeClass('loading').html(data.output);
-
-               }
-               $('.ical-import-dialog .notification').show().html(data.notification);
-
-            }
-        });
-    });
-
-    $('body').on('click', "a.update-all-icals", function(e){
-        e.preventDefault();
-        var $this = $(this),
-        listing_id  = $(this).data('listing-id');
-        $this.addClass('loading');
-         $.ajax({
-            type: 'POST', 
-            dataType: 'json',
-            url: listeo.ajaxurl,
-            data: { 
-                'action':     'refresh_listing_import_ical', 
-                'listing_id': listing_id,
-                //'nonce': nonce
-               },
-            success: function(data){
-                $this.removeClass('loading');
-               if (data.type == 'success'){
-                  $('.ical-import-dialog .notification').removeClass('error notice').addClass('success').show().html(data.notification);
-               } else if(data.type == 'error') {
-                  $('.ical-import-dialog .notification').removeClass('success notice').addClass('error').show().html(data.notification);
-               }
-             
-            }
-        });
-    });
-
 
     $('#send-comment-edit-review').on('submit',function(e) {
         $('#send-comment-edit-review button').addClass('loading');
@@ -793,28 +694,47 @@ $(document).ready(function(){
     // Contact Form Ajax
 
     $('#send-message-from-widget').on('submit',function(e) {
+
       $('#send-message-from-widget button').addClass('loading').prop('disabled', true);
 
-       $.ajax({
-            type: 'POST', dataType: 'json',
-            url: listeo.ajaxurl,
-            data: { 
-                'action': 'listeo_send_message', 
-                'recipient' : $(this).find('textarea#contact-message').data('recipient'),
-                'referral' : $(this).find('textarea#contact-message').data('referral'),
-                'message' : $(this).find('textarea#contact-message').val(),
-                //'nonce': nonce
-               },
-            success: function(data){
-              
-                if(data.type == "success") {
+      var $this = $(this).find('#fileInput');
+      var file_obj = $this.prop('files');
 
+      
+      var recipient = $(this).find('textarea#contact-message').data('recipient'),
+      referral = $(this).find('textarea#contact-message').data('referral'),
+      message = $(this).find('textarea#contact-message').val();
+
+
+      var form_data = new FormData();
+      for(i=0; i<file_obj.length; i++) {
+        form_data.append('file[]', file_obj[i]);
+      }
+      form_data.append('recipient',recipient);
+      form_data.append('referral',referral);
+      form_data.append('message',message);
+
+      form_data.append('action', 'listeo_send_message');
+
+        $.ajax({
+
+            type: 'POST',
+            url: listeo.ajaxurl,
+            data: form_data,
+            contentType: false,
+            processData: false,
+            success: function(data){
+                //console.log(data);
+                var obj = jQuery.parseJSON( data );
+                //console.log(obj.type);
+                if(obj.type == "success") {
+                  //console.log('success');
                   $('#send-message-from-widget button').removeClass('loading');
-                  $('#send-message-from-widget .notification').show().html(data.message);
+                  $('#send-message-from-widget .notification').show().html(obj.message);
                   window.setTimeout( closepopup, 3000 );
                   
                 } else {
-                    $('#send-message-from-widget .notification').removeClass('success').addClass('error').show().html(data.message);
+                    $('#send-message-from-widget .notification').removeClass('success').addClass('error').show().html(obj.message);
                     $('#send-message-from-widget button').removeClass('loading').prop('disabled', false);
                 }
 
@@ -832,13 +752,56 @@ $(document).ready(function(){
     }  
 
     $('#send-message-from-chat').on('submit',function(e) {
-      
+      $(this).find('textarea#contact-message').removeClass('error');
+      $('.loading').show();
+      $(this).find('button').prop('disabled', true);
       var message = $(this).find('textarea#contact-message').val();
 
-      if(message){
-        $(this).find('textarea#contact-message').removeClass('error');
+      var message = $(this).find('textarea#contact-message').val(),
+      recipient = $(this).find('input#recipient').val(),
+      conversation_id = $(this).find('input#conversation_id').val();
+      //console.log(message);
+
+      if(message) {
+      var $this = $(this).find('#fileInput');
+      var file_obj = $this.prop('files');
+      var form_data = new FormData();
+      for(i=0; i<file_obj.length; i++) {
+        form_data.append('file[]', file_obj[i]);
+      }
+      form_data.append('recipient',recipient);
+      form_data.append('conversation_id',conversation_id);
+      form_data.append('message',message);
+      form_data.append('action', 'listeo_send_message_chat');
+
+      //console.log(form_data);
+
+      $.ajax({
+            type: 'POST',
+            url: listeo.ajaxurl,
+            data: form_data,
+            contentType: false,
+            processData: false,
+            success: function(data){
+                  console.log(data);
+                  var obj = jQuery.parseJSON( data );
+                  //console.log(obj.type);
+                  if(obj.type == "success") {
+                      $(this).addClass('success');                    
+                      refreshMessages();
+                      $('#send-message-from-chat textarea').val('');
+                      $('#send-message-from-chat button').prop('disabled', false);
+                  } else {
+                      $(this).addClass('error');                    
+                  }
+                }
+      
+      });
+
+        /*$(this).find('textarea#contact-message').removeClass('error');
         $('.loading').show();
         $(this).find('button').prop('disabled', true);
+
          $.ajax({
               type: 'POST', dataType: 'json',
               url: listeo.ajaxurl,
@@ -857,11 +820,11 @@ $(document).ready(function(){
                       $('#send-message-from-chat textarea').val('');
                       $('#send-message-from-chat button').prop('disabled', false);
                   } else {
-                      $(this).addClass('error')                    
+                      $(this).addClass('error');                    
                   }
 
               }
-          });
+          });*/
        } else {
           $(this).find('textarea#contact-message').addClass('error');
 
@@ -930,7 +893,7 @@ $(document).ready(function(){
                 //'nonce': nonce
                },
             success: function(data){
-              
+                
                 if(data.type == "success") {
                     $('.message-bubbles').html(data.message);
                 }
@@ -944,7 +907,7 @@ $(document).ready(function(){
  
       }
     }
-    setTimeout(refreshMessages, 4000);
+    setTimeout(refreshMessages, 4000); /*4000*/
 
 
     
@@ -1032,6 +995,12 @@ if($("#avatar-uploader").length>0) {
 
 
   $('.dynamic #tax-listing_category,.dynamic #tax-listing_category-panel input').on('change',function(e) {
+      if($(this).hasClass('has_listeo_child_texononomy')){
+      	var tex_id = $(this).data('tex_id');
+	  	$('.has_listeo_child_texononomy_'+tex_id).show();
+	  	//$('')
+	  }
+      
       var cat_ids = []
       
       $('#tax-listing_feature-panel .checkboxes').addClass('loading');
@@ -1309,54 +1278,7 @@ if($("#avatar-uploader").length>0) {
     var $anchor = $(this);
     $("html, body").animate({ scrollTop: $($anchor.attr('href')).offset().top - 100 }, 1000);
   });
-  
-
-  /*----------------------------------------------------*/
-  /* Opening Hours
-  /*----------------------------------------------------*/
-
-  $('body').on('click', ".opening-day-remove", function(e){
-      e.preventDefault();
-      var div_class = $(this).data('remove');
-      $(this).parent().parent().remove();
-      $('div.'+div_class).remove();
-  }); 
-
-  $('body').on('click', ".opening-day-add-hours", function(e){
-      e.preventDefault();
-      var dayname = $(this).data('dayname');
-      var count = $(this).parents('.opening-day').find('.row').length;
-      var id = $(this).data('id');
-      var i = $(this).parents('.opening-day').find('.row').length;
-      
-      
-  
-      
-      var newElem = $(''+
-        '<div class="row"><div class="col-md-2 opening-day-tools"><a class="opening-day-remove button" data-remove="'+dayname+'-opening-hours-row'+count+'" href="#">'+listeo_core.remove+'</a>'+
-          '</div><div class="col-md-5 '+dayname+'-opening-hours-row'+count+'">'+
-            '<input type="text" class="listeo-flatpickr" name="_'+id+'_opening_hour[]" placeholder="'+listeo_core.opening_time+'" value=""></div>'+
-          '<div class="col-md-5 '+dayname+'-opening-hours-row'+count+'" >'+
-            '<input type="text" class="listeo-flatpickr" name="_'+id+'_closing_hour[]" placeholder="'+listeo_core.closing_time+'" value="">'+
-          '</div></div>'
-      );
-
-      newElem.appendTo($(this).parents('.opening-day'));
-      var time24 = false;
-    
-      if(listeo_core.clockformat){
-        time24 = true;
-      }
-      $(this).parents('.opening-day').find('.row:last .listeo-flatpickr').flatpickr({
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        time_24hr: time24,
-        disableMobile: true
-      });
-  });
-
-  /*----------------------------------------------------*/
+    /*----------------------------------------------------*/
   /* Pricing List
   /*----------------------------------------------------*/
 
@@ -1377,18 +1299,6 @@ if($("#avatar-uploader").length>0) {
             '<input type="number" step="0.01" placeholder="'+listeo_core.menu_price+'" name="_menu[0][menu_elements][0][price]" /></div>'+
             '<div class="fm-input pricing-bookable"><div class="switcher-tip" data-tip-content="'+listeo_core.pricingTooltip+'">'+
             '<input type="checkbox" class="input-checkbox switch_1" name="_menu[0][menu_elements][0][bookable]" /></div></div>'+
-            '<div class="fm-input pricing-bookable-options">'+
-                    '<select class="chosen-select" name="_menu[0][menu_elements][0][bookable_options]" id="">'+
-                      '<option value="onetime">'+listeo_core.onetimefee+'</option>'+
-                      '<option value="byguest">'+listeo_core.multiguest+'</option>'+
-                      '<option value="bydays">'+listeo_core.multidays+'</option>'+
-                      '<option value="byguestanddays">'+listeo_core.multiguestdays+'</option>'+
-                    '</select>'+
-                    '<div class="checkboxes in-row pricing-quanity-buttons">'+
-                      '<input type="checkbox"  class="input-checkbox" name="_menu[0][menu_elements][0][bookable_quantity]" id="_menu[0][menu_elements][0][bookable_quantity]" />'+
-                      '<label for="_menu[0][menu_elements][0][bookable_quantity]">'+listeo_core.quantitybuttons+'</label>'+
-                    '</div>'+
-              '</div>'+
             '<div class="fm-close"><a class="delete" href="#"><i class="fa fa-remove"></i></a></div>'+
           '</td>'+
         '</tr>');
@@ -1399,57 +1309,39 @@ if($("#avatar-uploader").length>0) {
 
     var prev_category_number = $('.pricing-submenu').last().data('number');
     var prev_data_iterator = $('tr.pricing-list-item:not(.pricing-submenu)').last().data('iterator');
-    
+    console.log('cat_iterator '+prev_category_number);
     if(prev_category_number == undefined) {
       prev_category_number = 0;
     }
-    
+    console.log('_iterator '+prev_data_iterator);
     var next_data_iterator = prev_data_iterator + 1;
-    
+    console.log('next_iterator '+next_data_iterator);
     var last_table_el = $('tr.pricing-list-item').last();
     
 
     newElem.find('input').each(function() {
+        
         // replace 1st number with current category title number
-        console.log(this.name);
         this.name = this.name.replace(/\[\d+\]/, '[' +prev_category_number+ ']');
-        this.id = this.id.replace(/\[\d+\]/, '[' +prev_category_number+ ']');
+        
         //replace 2nd number / if it's new category start from 0, if not iterate
         if(last_table_el.hasClass('pricing-submenu')){
           next_data_iterator = 0;
           // replace 2nd number
           this.name = replaceLast( this.name, '[0]', '[' + next_data_iterator + ']'  );
-          this.id = replaceLast( this.id, '[0]', '[' + next_data_iterator + ']'  );
         } else {
           // replace 2nd number
+          console.log(this.name);
           this.name = replaceLast( this.name, '[0]', '[' + next_data_iterator + ']' ); 
-          this.id = replaceLast( this.id, '[0]', '[' + next_data_iterator + ']' ); 
+          console.log(this.name);
         }
+        
+      
     });
-
-    newElem.find('label').each(function() {
-      console.log(this.htmlFor);
-        //replace 1st number with current category title number
-        this.name = this.htmlFor.replace(/\[\d+\]/, '[' +prev_category_number+ ']');
-        //replace 2nd number / if it's new category start from 0, if not iterate
-        if(last_table_el.hasClass('pricing-submenu')){
-          next_data_iterator = 0;
-          // replace 2nd number
-          this.htmlFor = replaceLast( this.htmlFor, '[0]', '[' + next_data_iterator + ']'  );
-        } else {
-          // replace 2nd number
-          this.htmlFor = replaceLast( this.htmlFor, '[0]', '[' + next_data_iterator + ']' ); 
-        }
-    });
-    //console.log(newElem);
+    console.log(newElem);
     
 
-    newElem.data('iterator',next_data_iterator).appendTo('table#pricing-list-container').data('iterator',next_data_iterator).find('select').trigger("chosen:updated");
-    $('.pricing-bookable-options select').trigger("chosen:updated").chosen({disable_search_threshold: 10, 
-          width:"100%",
-          no_results_text: listeo_core.no_results_text,
-          placeholder_text_single:  listeo_core.placeholder_text_single,
-          placeholder_text_multiple: listeo_core.placeholder_text_multiple});
+    newElem.data('iterator',next_data_iterator).appendTo('table#pricing-list-container').data('iterator',next_data_iterator);
   }
 
 
@@ -1567,7 +1459,7 @@ if($("#avatar-uploader").length>0) {
         // checking attribute listing type and set type of calendar
         autoUpdateInput: false,
        
-        minDate: moment().subtract(0, 'days'),
+        //minDate: moment().subtract(0, 'days'),
         locale: {
           format: wordpress_date_format.date,
           "firstDay"    : parseInt(wordpress_date_format.day),
@@ -1584,21 +1476,7 @@ if($("#avatar-uploader").length>0) {
                 listeo_core.day_short_th,
                 listeo_core.day_short_fr,
                 listeo_core.day_short_sa
-              ],
-              "monthNames": [
-                  listeo_core.january,
-                  listeo_core.february,
-                  listeo_core.march,
-                  listeo_core.april,
-                  listeo_core.may,
-                  listeo_core.june,
-                  listeo_core.july,
-                  listeo_core.august,
-                  listeo_core.september,
-                  listeo_core.october,
-                  listeo_core.november,
-                  listeo_core.december,
-              ],
+            ],
         
           },
     });
@@ -1693,34 +1571,235 @@ $('input.slot-time-input').keydown(function (e) {
 
     $this.val(r);
   });
-
-
-
-  //select export ical 
-  //
-  $("input.listeo-export-ical-input").blur(function() {
-    if ($(this).attr("data-selected-all")) {
-    //Remove atribute to allow select all again on focus        
-    $(this).removeAttr("data-selected-all");
-    }
-  });
-
-  $("input.listeo-export-ical-input").click(function() {
-    if (!$(this).attr("data-selected-all")) {
-      try {
-        $(this).selectionStart = 0;
-        $(this).selectionEnd = $(this).value.length + 1;
-        //add atribute allowing normal selecting post focus
-        $(this).attr("data-selected-all", true);
-      } catch (err) {
-        $(this).select();
-        //add atribute allowing normal selecting post focus
-        $(this).attr("data-selected-all", true);
-      }
-    }
-  });
 // ------------------ End Document ------------------ //
+
+// add listing page description field validate	
+$("#listing_description").blur(function(){
+	var listing_description = $(this).val();
+	//var len = $(this).val().length;
+	
+	if($(this).val().length < 35) {
+		var invalid_listing_description = 1;
+	}
+	else {
+		var invalid_listing_description = 0;
+	}
+	
+	if(listing_description.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi)) {
+		var email_found = 1;
+		//console.log("email found");
+	}
+	else {
+		var email_found = 0;
+	}
+	
+    if(listing_description.match(/[\+]?\d{6}|\(\d{3}\)\s?-\d{6}/)) {	
+		var mobile_found = 1;
+	}
+	else {
+		var mobile_found = 0; 
+	}
+	
+	if(email_found == 1 && mobile_found == 1 && invalid_listing_description == 1) {
+		$(this).addClass("invalid_listing_description");
+		$(".emailnotic_listing_description").remove();
+		var email_mobile_notic = '<div style="margin-top: 5px;" class="emailnotic_listing_description notification error listing-manager-error"><p>Please enter minimum 35 characters for description</p><p>Please remove email form description</p><p>Please remove mobile no form description</p><a class="close"></a></div>';
+		
+		$("#wp-listing_description-editor-container").after(email_mobile_notic);
+	}
+	else if(invalid_listing_description == 1){
+		$(this).addClass("invalid_listing_description");
+		$(".emailnotic_listing_description").remove();
+		var email_mobile_notic = '<div style="margin-top: 5px;" class="emailnotic_listing_description notification error listing-manager-error"><p>Please enter minimum 35 characters for description</p></a></div>';
+		$("#wp-listing_description-editor-container").after(email_mobile_notic);
+	}
+	else if(email_found == 1) {
+		$(this).addClass("invalid_listing_description");
+		$(".emailnotic_listing_description").remove();
+		var email_mobile_notic = '<div style="margin-top: 5px;" class="emailnotic_listing_description notification error listing-manager-error"><p>Please Remove email form description</p><a class="close"></a></div>';
+		
+		$("#wp-listing_description-editor-container").after(email_mobile_notic);
+	}
+	else if(mobile_found == 1) {
+		$(this).addClass("invalid_listing_description");
+		$(".emailnotic_listing_description").remove();
+		var email_mobile_notic = '<div style="margin-top: 5px;" class="emailnotic_listing_description notification error listing-manager-error"><p>Please Remove mobile no form description</p></a></div>';
+		
+		$("#wp-listing_description-editor-container").after(email_mobile_notic);
+	}
+	else
+	{
+		$(this).removeClass("invalid_listing_description");
+		$(".emailnotic_listing_description").remove();
+	}
+	
+});	
+
+
+
+// add listing page description field validate  
+$("#listing_title").blur(function(){
+  console.log($(this).val());
+  if($(this).val == "") {
+    $(this).addClass("invalid_listing_title");
+    $(".listing_title_noti").remove();
+    var listing_title_notic = '<div class="listing_title_noti" style="margin-top: 10px;color:red;"><p><b>Please enter title<b></p><a class="close"></a></div>';
+    
+    $("#listing_title").after(listing_title_notic);
+  }
+  else
+  {
+    $(this).removeClass("invalid_listing_title");
+    $(".listing_title_noti").remove();
+  }
+  
+}); 
+
+// add listing page description field validate  
+$("#_normal_price").blur(function(){
+  console.log($(this).val());
+  if($(this).val == "" || jQuery("#_normal_price").val() <= 0) {
+    $(this).addClass("invalid_listing_price");
+    $(".invalid_price_noti").remove();
+    var invalid_price_noti = '<div class="invalid_price_noti" style="margin-top: 10px;color:red;"><p><b>Please enter price<b></p><a class="close"></a></div>';
+    
+    $("#_normal_price").after(invalid_price_noti);
+  }
+  else
+  {
+    $(this).removeClass("invalid_price_price");
+    $(".invalid_price_noti").remove();
+  }
+  
+}); 
+
+
+
+	
+//Create An Offer Popup script
+//$(document).on('click','#listeo_add_offer_btn',function(){
+$('#listeo_add_offer_btn').click(function(){
+	var user_id = $("#user_id").val();
+	var listeo_offer_title = $("#listeo_offer_title").val();
+	var listeo_offer_description = $("#listeo_offer_description").val();
+	var listeo_offer_price = $("#listeo_offer_price").val();
+	var conversation_id = $('#send-message-from-chat').find('input#conversation_id').val();
+	
+    // Custom jQuery validation create offer popup	
+	
+	if(listeo_offer_title == "" || listeo_offer_description == "" || listeo_offer_price == "" || listeo_offer_price <= 0){
+		if(listeo_offer_title == ""){
+			$('.listeo_title_label').removeClass('listeo_offer_validation_hide');
+			$('.listeo_title_label').addClass('listeo_offer_validation_show');
+		}
+		if(listeo_offer_description == ""){
+			$('.listeo_description_label').removeClass('listeo_offer_validation_hide');
+			$('.listeo_description_label').addClass('listeo_offer_validation_show');
+		}
+		
+		if(listeo_offer_price == ""){
+			$('.listeo_price_label').removeClass('listeo_offer_validation_hide');
+			$('.listeo_price_label').addClass('listeo_offer_validation_show');
+			$('.listeo_invalid_price_label').addClass('listeo_offer_validation_hide');
+			$('.listeo_invalid_price_label').removeClass('listeo_offer_validation_show');
+		}
+		else if(listeo_offer_price <= 0){
+			$('.listeo_invalid_price_label').removeClass('listeo_offer_validation_hide');
+			$('.listeo_invalid_price_label').addClass('listeo_offer_validation_show');
+			$('.listeo_price_label').addClass('listeo_offer_validation_hide');
+			$('.listeo_price_label').removeClass('listeo_offer_validation_show');
+		}
+	}
+	else{	
+		// Create An Offer ajax
+		$.ajax({
+        	type: 'POST', dataType: 'json',
+            url: listeo.ajaxurl,
+            data: { 
+            	'action': 'listeo_create_offer',
+            	'user_id': user_id, 
+                'listeo_offer_title': listeo_offer_title,
+                'listeo_offer_description': listeo_offer_description,
+                'listeo_offer_price': listeo_offer_price,
+                'conversation_id': conversation_id,
+               
+            	},
+            success: function(data){
+                if (data.type == "success"){
+           			//console.log(data);
+           			var listeo_offer_title = $("#listeo_offer_title").val('');
+					var listeo_offer_description = $("#listeo_offer_description").val('');
+					var listeo_offer_price = $("#listeo_offer_price").val('');
+           			$('.mfp-close').trigger('click');         
+           			refreshMessages();
+                } else {
+                    console.log('error in create offer ajax');                                       
+                	console.log(data);
+                }
+
+            }
+        });	
+	}
 });
+
+});
+
+// custom jquery validation for create custom offer
+$('#listeo_offer_title').on('change keyup',function(){
+	if($(this).val() == ""){
+		$('.listeo_title_label').removeClass('listeo_offer_validation_hide');
+		$('.listeo_title_label').addClass('listeo_offer_validation_show');
+	}
+	else{
+		$('.listeo_title_label').addClass('listeo_offer_validation_hide');
+		$('.listeo_title_label').removeClass('listeo_offer_validation_show');
+	}
+});
+$('#listeo_offer_description').on('change keyup',function(){
+	//var len = $(this).val().length;
+	
+	if($(this).val() == ""){
+		$('.listeo_description_label').removeClass('listeo_offer_validation_hide');
+		$('.listeo_description_label').addClass('listeo_offer_validation_show');
+	}
+	else{
+		$('.listeo_description_label').addClass('listeo_offer_validation_hide');
+		$('.listeo_description_label').removeClass('listeo_offer_validation_show');
+	}
+});
+$('#listeo_offer_price').on('change keyup',function(){
+	if($(this).val() == ""){
+		$('.listeo_invalid_price_label').addClass('listeo_offer_validation_hide');
+		$('.listeo_invalid_price_label').removeClass('listeo_offer_validation_show');
+		$('.listeo_price_label').removeClass('listeo_offer_validation_hide');
+		$('.listeo_price_label').addClass('listeo_offer_validation_show');
+		
+	}
+	else if($(this).val() <= 0) {
+		$('.listeo_price_label').addClass('listeo_offer_validation_hide');
+		$('.listeo_price_label').removeClass('listeo_offer_validation_show');
+		$('.listeo_invalid_price_label').removeClass('listeo_offer_validation_hide');
+		$('.listeo_invalid_price_label').addClass('listeo_offer_validation_show');
+	}
+	else{
+		$('.listeo_invalid_price_label').removeClass('listeo_offer_validation_show');
+		$('.listeo_invalid_price_label').addClass('listeo_offer_validation_hide');
+		$('.listeo_price_label').addClass('listeo_offer_validation_hide');
+		$('.listeo_price_label').removeClass('listeo_offer_validation_show');
+	}
+});
+
+/*$('.listeo_liting_single_galary_image').on('click',function(){
+	console('click');
+	//console.log($(this).data('url'));	
+});*/
+
+$('.listing-item').find('.listeo_liting_single_tttt').click(function(){
+	console.log('listing-item');
+	//console.log($(this).data('url'));	
+});
+
+
 
 })(this.jQuery);
 /**/

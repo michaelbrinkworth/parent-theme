@@ -82,12 +82,13 @@ class Listeo_Core_Paid_Listings_Subscriptions {
 	private function get_listing_subscription_order_id( $listing_id ) {
 		if ( 'listing' === get_post_type( $listing_id ) ) {
 			$user_package_id = get_post_meta( $listing_id, '_user_package_id', true );
-			$user_package    = listeo_core_get_user_package( $user_package_id );
+			$user_package    = listeo_core_get_package( $user_package_id );
 			$package_id      = get_post_meta( $listing_id, '_package_id', true );
 			$package         = wc_get_product( $package_id );
 			if ( $user_package
 			     && $user_package->has_package()
 				 && ( $package instanceof WC_Product_Listing_Package_Subscription)
+			     && 'listing' === $package->get_package_subscription_type()
 			) {
 				return $user_package->get_order_id();
 			}
@@ -103,6 +104,7 @@ class Listeo_Core_Paid_Listings_Subscriptions {
 	 */
 	public function get_package_subscription_type( $product_id ) {
 		$subscription_type = get_post_meta( $product_id, '_package_subscription_type', true );
+		listeo_write_log('sub type: '.$subscription_type);
 		return empty( $subscription_type ) ? 'package' : $subscription_type;
 	}
 
@@ -136,9 +138,8 @@ class Listeo_Core_Paid_Listings_Subscriptions {
 
 			if ( $package_product_id ) {
 				$subscription_type = $this->get_package_subscription_type( $package_product_id );
-				
-				//if($subscription_type == 'listing_package_subscription') {
 
+				if ( 'listing' === $subscription_type ) {
 					$new_count = $wpdb->get_var( $wpdb->prepare( "SELECT package_count FROM {$wpdb->prefix}listeo_core_user_packages WHERE id = %d;", $package_id ) );
 					$new_count --;
 
@@ -155,10 +156,7 @@ class Listeo_Core_Paid_Listings_Subscriptions {
 					// Remove package meta after adjustment
 					delete_post_meta( $post->ID, '_package_id' );
 					delete_post_meta( $post->ID, '_user_package_id' );
-				//}
-				
-				
-				
+				}
 			}
 		}
 	}
@@ -180,21 +178,22 @@ class Listeo_Core_Paid_Listings_Subscriptions {
 				$package_product    = get_post( $package_product_id );
 
 				if ( $package_product_id ) {
-					
-					
-					$new_count = $wpdb->get_var( $wpdb->prepare( "SELECT package_count FROM {$wpdb->prefix}listeo_core_user_packages WHERE id = %d;", $package_id ) );
-					$new_count --;
+					$subscription_type = $this->get_package_subscription_type( $package_product_id );
 
-					$wpdb->update(
-						"{$wpdb->prefix}listeo_core_user_packages",
-						array(
-							'package_count'  => max( 0, $new_count ),
-						),
-						array(
-							'id' => $package_id,
-						)
-					);
-					
+					if ( 'listing' === $subscription_type ) {
+						$new_count = $wpdb->get_var( $wpdb->prepare( "SELECT package_count FROM {$wpdb->prefix}listeo_core_user_packages WHERE id = %d;", $package_id ) );
+						$new_count --;
+
+						$wpdb->update(
+							"{$wpdb->prefix}listeo_core_user_packages",
+							array(
+								'package_count'  => max( 0, $new_count ),
+							),
+							array(
+								'id' => $package_id,
+							)
+						);
+					}
 				}
 			}
 		}
@@ -217,21 +216,22 @@ public function untrash_post( $id ) {
 			$package_product    = get_post( $package_product_id );
 
 			if ( $package_product_id ) {
-				
-				
-				$package  = $wpdb->get_row( $wpdb->prepare( "SELECT package_count, package_limit FROM {$wpdb->prefix}listeo_core_user_packages WHERE id = %d;", $package_id ) );
-				$new_count = $package->package_count + 1;
+				$subscription_type = $this->get_package_subscription_type( $package_product_id );
 
-				$wpdb->update(
-					"{$wpdb->prefix}listeo_core_user_packages",
-					array(
-						'package_count'  => min( $package->package_limit, $new_count ),
-					),
-					array(
-						'id' => $package_id,
-					)
-				);
-				
+				if ( 'listing' === $subscription_type ) {
+					$package  = $wpdb->get_row( $wpdb->prepare( "SELECT package_count, package_limit FROM {$wpdb->prefix}listeo_core_user_packages WHERE id = %d;", $package_id ) );
+					$new_count = $package->package_count + 1;
+
+					$wpdb->update(
+						"{$wpdb->prefix}listeo_core_user_packages",
+						array(
+							'package_count'  => min( $package->package_limit, $new_count ),
+						),
+						array(
+							'id' => $package_id,
+						)
+					);
+				}
 			}
 		}
 	}
@@ -256,8 +256,8 @@ public function subscription_ended( $subscription, $paused = false ) {
 	global $wpdb;
 
 	foreach ( $subscription->get_items() as $item ) {
-		
-		listeo_write_log('subscription_ended');
+		$subscription_type = $this->get_package_subscription_type( $item['product_id'] );
+		listeo_write_log('subtype'.$subscription_type);
 		/**
 		 * @var WC_Order $parent
 		 */
@@ -277,8 +277,8 @@ public function subscription_ended( $subscription, $paused = false ) {
 			);
 
 			// Expire listings posted with package
-			
-			$listing_ids = listeo_core_get_listings_for_package( $user_package->id );
+			if ( 'package' === $subscription_type ) {
+				$listing_ids = listeo_core_get_listings_for_package( $user_package->id );
 				
 			foreach ( $listing_ids as $listing_id ) {
 
@@ -298,7 +298,7 @@ public function subscription_ended( $subscription, $paused = false ) {
 					// Make a record of the subscription ID in case of re-activation
 					update_post_meta( $listing_id, '_expired_subscription_id', $subscription->get_id() );
 				}
-			
+			}
 		}
 	}// End foreach().
 
@@ -313,10 +313,10 @@ public function subscription_ended( $subscription, $paused = false ) {
 public function subscription_activated( $subscription ) {
 	global $wpdb;
 
-	if ( get_post_meta( $subscription->get_id(), 'listeo_core_subscription_packages_processed', true ) ) {
-		return;
-	}
-	listeo_write_log('sub activated');
+	// if ( get_post_meta( $subscription->get_id(), 'listeo_core_subscription_packages_processed', true ) ) {
+	// 	return;
+	// }
+
 	// Remove any old packages for this subscription
 	$parent            = $subscription->get_parent();
 	$parent_id         = ! empty( $parent ) ?  $parent->get_id() : null;
@@ -347,9 +347,11 @@ public function subscription_activated( $subscription ) {
 			 * already match this ID and approve them (useful on
 			 * re-activation of a sub).
 			 */
-			
-			$listing_ids = (array) $wpdb->get_col( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", '_expired_subscription_id', $subscription->get_id() ) );
-			
+			if ( 'package' === $subscription_type ) {
+				$listing_ids = (array) $wpdb->get_col( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", '_expired_subscription_id', $subscription->get_id() ) );
+			} else {
+				$listing_ids = array();
+			}
 
 			$listing_ids[] = isset( $item['listing_id'] ) ? $item['listing_id'] : '';
 			$listing_ids   = array_unique( array_filter( array_map( 'absint', $listing_ids ) ) );
@@ -374,7 +376,7 @@ public function subscription_activated( $subscription ) {
 public function subscription_renewed( $subscription ) {
 	global $wpdb;
 
-	listeo_write_log('yup we are renewing');
+
 	foreach ( $subscription->get_items() as $item ) {
 		$product           = wc_get_product( $item['product_id'] );
 		$subscription_type = $this->get_package_subscription_type( $item['product_id'] );
@@ -383,23 +385,34 @@ public function subscription_renewed( $subscription ) {
 		$legacy_id         = isset( $parent_id ) ? $parent_id : $subscription->get_id();
 
 		// Renew packages which refresh every term
-
-		
+		if ( 'thisnotyet' === $subscription_type ) {
+			if ( ! $wpdb->update(
+				"{$wpdb->prefix}listeo_core_user_packages",
+				array(
+					'package_count'  => 0,
+				),
+				array(
+					'order_id'   => $subscription->get_id(),
+					'product_id' => $item['product_id'],
+				)
+			) ) {
+				listeo_core_give_user_package( $subscription->get_user_id(), $item['product_id'], $subscription->get_id() );
+			}
+		} else {
 			// Otherwise the listings stay active, but we can ensure they are synced in terms of featured status etc
-		if ( $user_package_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}listeo_core_user_packages WHERE order_id IN ( %d, %d ) AND product_id = %d;", $subscription->get_id(), $legacy_id, $item['product_id'] ) ) ) {
-			foreach ( $user_package_ids as $user_package_id ) {
-				$package = listeo_core_get_user_package( $user_package_id );
-				listeo_write_log($package);
-				if ( $listing_ids = listeo_core_get_listings_for_package( $user_package_id ) ) {
-					foreach ( $listing_ids as $listing_id ) {
-						listeo_write_log('id'.$listing_id);
-						// Featured or not
-						update_post_meta( $listing_id, '_featured', $package->is_featured() ? 1 : 0 );
+			if ( $user_package_ids = $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}listeo_core_user_packages WHERE order_id IN ( %d, %d ) AND product_id = %d;", $subscription->get_id(), $legacy_id, $item['product_id'] ) ) ) {
+				foreach ( $user_package_ids as $user_package_id ) {
+					$package = listeo_core_get_user_package( $user_package_id );
+
+					if ( $listing_ids = listeo_core_get_listings_for_package( $user_package_id ) ) {
+						foreach ( $listing_ids as $listing_id ) {
+							// Featured or not
+							update_post_meta( $listing_id, '_featured', $package->is_featured() ? 1 : 0 );
+						}
 					}
 				}
 			}
 		}
-		
 	}// End foreach().
 }
 
@@ -509,32 +522,32 @@ public function switch_package( $user_id, $new_subscription, $old_subscription )
 		}
 
 		// Update old listings
-		
-		$listing_ids = listeo_core_get_listings_for_package( $user_package->id );
+		if ( 'package' === $new_subscription->type && $switching_to_package_id ) {
+			$listing_ids = listeo_core_get_listings_for_package( $user_package->id );
 
-		foreach ( $listing_ids as $listing_id ) {
-			// If we are not upgrading, expire the old listing
-			if ( ! $is_upgrade ) {
-				$listing = array(
-					'ID' => $listing_id,
-					'post_status' => 'expired',
-				);
-				wp_update_post( $listing );
-			} else {
-				/** This filter is documented in includes/package-functions.php */
-				
-				// Change the user package ID and package ID
-				update_post_meta( $listing_id, '_user_package_id', $switching_to_package_id );
-				update_post_meta( $listing_id, '_package_id', $new_subscription->product_id );
+			foreach ( $listing_ids as $listing_id ) {
+				// If we are not upgrading, expire the old listing
+				if ( ! $is_upgrade ) {
+					$listing = array(
+						'ID' => $listing_id,
+						'post_status' => 'expired',
+					);
+					wp_update_post( $listing );
+				} else {
+					/** This filter is documented in includes/package-functions.php */
+					
+					// Change the user package ID and package ID
+					update_post_meta( $listing_id, '_user_package_id', $switching_to_package_id );
+					update_post_meta( $listing_id, '_package_id', $new_subscription->product_id );
+				}
+
+				// Featured or not
+				update_post_meta( $listing_id, '_featured', $does_new_subscription_feature_listings ? 1 : 0 );
+
+				// Fire action
+				do_action( 'wc_paid_listings_switched_subscription', $listing_id, $user_package );
 			}
-
-			// Featured or not
-			update_post_meta( $listing_id, '_featured', $does_new_subscription_feature_listings ? 1 : 0 );
-
-			// Fire action
-			do_action( 'wc_paid_listings_switched_subscription', $listing_id, $user_package );
 		}
-		
 	}// End if().
 }
 }

@@ -374,15 +374,15 @@ class Listeo_Core_Submit  {
 						
 				),
 			),
-			'cancellation_policy' => array(
+			/*'cancellation_policy' => array(
 				'title' 	=> __('Cancellation policy','listeo_core'),
 				//'class' 	=> 'margin-top-40',
 				'icon' 		=> 'sl sl-icon-docs',
 				'fields' 	=> array(
-						'_cancellation_policy' => array(
-							'label'       => __( 'Cancellation Policy', 'listeo_core' ),
-							'name'       => '_cancellation_policy',
-							'type'        => 'text',
+						'cancellation_policy_description' => array(
+							'label'       => __( 'Description', 'listeo_core' ),
+							'name'       => 'cancellation_policy_description',
+							'type'        => 'wp-editor',
 							'description' => __( 'Add Cancellation Policy Description .', 'listeo_core' ),
 							'placeholder' => '',
 							'class'		  => '',
@@ -390,7 +390,7 @@ class Listeo_Core_Submit  {
 							'required'    => false,
 						),
 				),
-			),
+			),*/
 						
 			'location' =>  array(
 				'title' 	=> __('Location','listeo_core'),
@@ -535,7 +535,7 @@ class Listeo_Core_Submit  {
 						'_email_contact_widget' => array(
 							'label'       => __( 'Enable Contact Widget', 'listeo_core' ),
 							'type'        => 'checkbox',
-							'tooltip'	  => __('With this option enabled listing will display Contact Form Widget that will send emails to this address', 'listeo_core'),
+							'tooltip'	  => __('With 12 this option enabled listing will display Contact Form Widget that will send emails to this address', 'listeo_core'),
 							'required'    => false,
 							
 							'placeholder' => '',
@@ -1037,9 +1037,8 @@ class Listeo_Core_Submit  {
 			),
 
 		);
-		
+
 		$this->fields = apply_filters('submit_listing_form_fields', $this->fields);
-		
 		// get listing type
 		if ( ! $this->listing_type)
 		{
@@ -1218,15 +1217,6 @@ class Listeo_Core_Submit  {
 							'type'        => 'hidden',							
 							'required'    => false,
 						);
-		$this->fields['cancellation_policy']['title']='Cancellation Policy';
-		
-		$this->fields['cancellation_policy']['fields']['_cancellation_policy'] = array(
-							'label'       => __( 'Cancellation Policy', 'listeo_core' ),
-							'name'        => '_cancellation_policy',
-							'type'        => 'wp-editor',							
-							'required'    => false,
-						);
-		
 
 		$this->fields['gallery']['fields']['_thumbnail_id'] = array(
 							'label'       => __( 'Thumbnail ID', 'listeo_core' ),
@@ -1236,13 +1226,6 @@ class Listeo_Core_Submit  {
 							'priority'    => 1,
 							'required'    => false,
 						);
-		
-		
-		$this->fields['details']['fields']['_email_contact_widget']['type']='hidden';
-		$this->fields['details']['fields']['_email_contact_widget']['value']='on'; 
-		$this->fields['menu']['fields']['_menu_status']['type']='hidden';
-		$this->fields['menu']['fields']['_menu_status']['value']='on'; 
-		
 
 		switch ( $this->listing_type) {
 			case 'event':
@@ -1361,6 +1344,7 @@ class Listeo_Core_Submit  {
 	 * Displays the form.
 	 */
 	public function submit() {
+
 		$this->init_fields();
 		$template_loader = new Listeo_Core_Template_Loader;
 		if ( ! is_user_logged_in() ) {
@@ -1370,11 +1354,11 @@ class Listeo_Core_Submit  {
 
 
 		if ( is_user_logged_in() && $this->listing_id ) {
-			
 			$listing = get_post( $this->listing_id );
 			
 			//basic_info/fields/listing_title
 			if($listing){
+
 				foreach ( $this->fields as $group_key => $group_fields ) {
 					foreach ( $group_fields['fields'] as $key => $field ) {
 					
@@ -1447,19 +1431,14 @@ class Listeo_Core_Submit  {
 			}
 			
 		}  elseif ( is_user_logged_in() && empty( $_POST['submit_listing'] ) ) {
-			
 			$this->fields = apply_filters( 'submit_listing_form_fields_get_user_data', $this->fields, get_current_user_id() );
-			
 		}
 		// ini_set('xdebug.var_display_max_depth', '10');
 		// ini_set('xdebug.var_display_max_children', '256');
 		// ini_set('xdebug.var_display_max_data', '1024');
 		// var_dump($this->fields);
-
-
-
-
-	$template_loader->set_template_data( 
+		
+		$template_loader->set_template_data( 
 			array( 
 				'action' 		=> $this->get_action(),
 				'fields' 		=> $this->fields,
@@ -1470,12 +1449,7 @@ class Listeo_Core_Submit  {
 				'submit_button_text' => apply_filters( 'submit_listing_form_submit_button_text', __( 'Preview', 'listeo_core' ) )
 				) 
 			)->get_template_part( 'listing-submit' );
-
-
-		
-		
 		}
-		
 	} 
 	
 

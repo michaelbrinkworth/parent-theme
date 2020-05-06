@@ -39,34 +39,45 @@ if(isset($_menu[0]['menu_elements'][0]['name']) && !empty($_menu[0]['menu_elemen
 					endif;
 					if(isset($menu['menu_elements']) && !empty($menu['menu_elements'])) :
 					?>
-					<ul class="<?php if(!$has_menu_title) { ?>pricing-menu-no-title<?php } ?>">
+					<div class="row listeo_pricing_items">
 						<?php foreach ($menu['menu_elements'] as $item) { ?>
-							<li>
-								<?php if(isset($item['name']) && !empty($item['name'])) { ?><h5><?php echo esc_html($item['name']) ?></h5><?php } ?>
-								<?php if(isset($item['description']) && !empty($item['description'])) { ?><p><?php echo ($item['description']) ?></p><?php } ?>
-								<?php  if(isset($item['price']) && !empty($item['price'])) { ?><span>
-									<?php 
-									$currency_abbr = get_option( 'listeo_currency' );
-									$currency_postion = get_option( 'listeo_currency_postion' );
-									$currency_symbol = Listeo_Core_Listing::get_currency_symbol($currency_abbr); 
-									?>
-									<?php 
-										if(empty($item['price']) || $item['price'] == 0) {
-											esc_html_e('Free','listeo_core');
-										} else {
-										 	if($currency_postion == 'before') { echo $currency_symbol.' '; } 
-											echo esc_html($item['price']); 
-											if($currency_postion == 'after') { echo ' '.$currency_symbol; } 
-										}
-										?>
-									</span><?php } 
-									else if(!isset($item['price']) || $item['price'] == '0'){ ?>
-										<span><?php esc_html_e('Free','listeo_core'); ?></span>
-									<?php }  ?>
-							</li>
+							<div class="col-md-4 listeo_pricing_single_item_main">
+								<div class="listeo_pricing_single_item">
+									<div>
+										<?php if($item['name']) { ?>
+											<h5><?php echo wp_trim_words($item['name'], 5, '...'); ?></h5>
+										<?php } ?>
+									</div>
+									<div>
+										<?php  if($item['price']) { ?><h5>
+											<?php 
+												$currency_abbr = get_option( 'listeo_currency' );
+												$currency_postion = get_option( 'listeo_currency_postion' );
+												$currency_symbol = Listeo_Core_Listing::get_currency_symbol($currency_abbr); 
+											?>
+											<?php 
+												if(empty($item['price']) || $item['price'] == 0) {
+													esc_html_e('Free','listeo_core');
+												} else {
+													if($currency_postion == 'before') { echo $currency_symbol.' '; } 
+														echo esc_html($item['price']); 
+														if($currency_postion == 'after') { echo ' '.$currency_symbol; } 
+												}
+											?>
+										</h5><?php } 
+										else if($item['price'] == '0'){ ?>
+											<b><?php esc_html_e('Free','listeo_core'); ?></b>
+										<?php }  ?>
+									</div>
+									<div>
+										<?php if($item['description']) { ?>
+											<p><?php echo wp_trim_words($item['description'], 10, '...'); ?></p>
+										<?php } ?>
+									</div>	
+								</div>
+							</div>
 						<?php } ?>
-					</ul>
-					
+					</div>
 				<?php endif;
 				}
 			?>

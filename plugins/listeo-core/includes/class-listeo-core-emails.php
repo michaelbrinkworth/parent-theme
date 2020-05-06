@@ -48,14 +48,13 @@ class Listeo_Core_Emails {
 		add_action( 'listeo_mail_to_user_waiting_approval', array($this, 'mail_to_user_waiting_approval'));
 		add_action( 'listeo_mail_to_user_instant_approval', array($this, 'mail_to_user_instant_approval'));
 		add_action( 'listeo_mail_to_owner_new_reservation', array($this, 'mail_to_owner_new_reservation'));
-		add_action( 'listeo_mail_to_user_canceled', array($this, 'mail_to_user_canceled'));
 		add_action( 'listeo_mail_to_owner_new_intant_reservation', array($this, 'mail_to_owner_new_instant_reservation'));
 		add_action( 'listeo_mail_to_user_pay', array($this, 'mail_to_user_pay'));
 		add_action( 'listeo_mail_to_owner_paid', array($this, 'mail_to_owner_paid'));
 		add_action( 'listeo_mail_to_user_free_confirmed', array($this, 'mail_to_user_free_confirmed'));
 		add_action( 'listeo_mail_to_user_new_conversation', array($this, 'new_conversation_mail'));
 		add_action( 'listeo_mail_to_user_new_message', array($this, 'new_message_mail'));
-		
+		//add_action( 'listeo_mail_to_user_canceled', array($this, 'mail_to_user_canceled'));
 		add_action( 'listeo_welcome_mail', array($this, 'welcome_mail'));
 
 
@@ -255,7 +254,6 @@ class Listeo_Core_Emails {
 			'listing_url'  => get_permalink($booking['listing_id']),
 			'dates' => (isset($booking_data['dates'])) ? $booking_data['dates'] : '',
 			'details' => (isset($booking_data['details'])) ? $booking_data['details'] : '',
-			'service' => (isset($booking_data['service'])) ? $booking_data['service'] : '',
 			'tickets' => (isset($booking_data['tickets'])) ? $booking_data['tickets'] : '',
 			'adults' =>(isset($booking_data['adults'])) ? $booking_data['adults'] : '',
 			'children' => (isset($booking_data['children'])) ? $booking_data['children'] : '',
@@ -286,7 +284,6 @@ class Listeo_Core_Emails {
 			'listing_url'  => get_permalink($booking['listing_id']),
 			'dates' => (isset($booking_data['dates'])) ? $booking_data['dates'] : '',
 			'details' => (isset($booking_data['details'])) ? $booking_data['details'] : '',
-			'service' => (isset($booking_data['service'])) ? $booking_data['service'] : '',
 			'tickets' => (isset($booking_data['tickets'])) ? $booking_data['tickets'] : '',
 			'adults' =>(isset($booking_data['adults'])) ? $booking_data['adults'] : '',
 			'children' => (isset($booking_data['children'])) ? $booking_data['children'] : '',
@@ -317,7 +314,6 @@ class Listeo_Core_Emails {
 			'listing_url'  => get_permalink($booking['listing_id']),
 			'dates' => (isset($booking_data['dates'])) ? $booking_data['dates'] : '',
 			'details' => (isset($booking_data['details'])) ? $booking_data['details'] : '',
-			'service' => (isset($booking_data['service'])) ? $booking_data['service'] : '',
 			'tickets' => (isset($booking_data['tickets'])) ? $booking_data['tickets'] : '',
 			'adults' =>(isset($booking_data['adults'])) ? $booking_data['adults'] : '',
 			'children' => (isset($booking_data['children'])) ? $booking_data['children'] : '',
@@ -346,7 +342,6 @@ class Listeo_Core_Emails {
 			'listing_url'  => get_permalink($booking['listing_id']),
 			'dates' => (isset($booking_data['dates'])) ? $booking_data['dates'] : '',
 			'details' => (isset($booking_data['details'])) ? $booking_data['details'] : '',
-			'service' => (isset($booking_data['service'])) ? $booking_data['service'] : '',
 			'tickets' => (isset($booking_data['tickets'])) ? $booking_data['tickets'] : '',
 			'adults' =>(isset($booking_data['adults'])) ? $booking_data['adults'] : '',
 			'children' => (isset($booking_data['children'])) ? $booking_data['children'] : '',
@@ -356,35 +351,6 @@ class Listeo_Core_Emails {
 		$subject 	 = $this->replace_shortcode( $args, $subject );
 
 		$body 	 = get_option('listeo_booking_owner_new_booking_email_content');
-		$body 	 = $this->replace_shortcode( $args, $body );
-		self::send( $email, $subject, $body );
-	}
-
-	function mail_to_user_canceled($args){
-		if(!get_option('listeo_booking_user_cancallation_email')){
-			return;
-		}
-		$email 		=  $args['email'];
-		$booking = $args['booking'];
-		$booking_data = $this->get_booking_data_emails($args['booking']);
-		$args = array(
-			'user_name' 	=> get_the_author_meta('display_name',$booking['owner_id']),
-			'user_mail' 	=> $email,
-			'booking_date' => $booking['created'],
-			'listing_name' => get_the_title($booking['listing_id']),
-			'listing_url'  => get_permalink($booking['listing_id']),
-			'dates' => (isset($booking_data['dates'])) ? $booking_data['dates'] : '',
-			'details' => (isset($booking_data['details'])) ? $booking_data['details'] : '',
-			'service' => (isset($booking_data['service'])) ? $booking_data['service'] : '',
-			'tickets' => (isset($booking_data['tickets'])) ? $booking_data['tickets'] : '',
-			'adults' =>(isset($booking_data['adults'])) ? $booking_data['adults'] : '',
-			'children' => (isset($booking_data['children'])) ? $booking_data['children'] : '',
-			);
-
-		$subject 	 = get_option('listeo_booking_user_cancellation_email_subject');
-		$subject 	 = $this->replace_shortcode( $args, $subject );
-
-		$body 	 = get_option('listeo_booking_user_cancellation_email_content');
 		$body 	 = $this->replace_shortcode( $args, $body );
 		self::send( $email, $subject, $body );
 	}
@@ -405,7 +371,6 @@ class Listeo_Core_Emails {
 			'listing_url'  => get_permalink($booking['listing_id']),
 			'dates' => (isset($booking_data['dates'])) ? $booking_data['dates'] : '',
 			'details' => (isset($booking_data['details'])) ? $booking_data['details'] : '',
-			'service' => (isset($booking_data['service'])) ? $booking_data['service'] : '',
 			'tickets' => (isset($booking_data['tickets'])) ? $booking_data['tickets'] : '',
 			'adults' =>(isset($booking_data['adults'])) ? $booking_data['adults'] : '',
 			'children' => (isset($booking_data['children'])) ? $booking_data['children'] : '',
@@ -434,7 +399,6 @@ class Listeo_Core_Emails {
 			'listing_url'  => get_permalink($booking['listing_id']),
 			'dates' => (isset($booking_data['dates'])) ? $booking_data['dates'] : '',
 			'details' => (isset($booking_data['details'])) ? $booking_data['details'] : '',
-			'service' => (isset($booking_data['service'])) ? $booking_data['service'] : '',
 			'tickets' => (isset($booking_data['tickets'])) ? $booking_data['tickets'] : '',
 			'aduts' =>(isset($booking_data['adults'])) ? $booking_data['adults'] : '',
 			'children' => (isset($booking_data['children'])) ? $booking_data['children'] : '',
@@ -465,7 +429,6 @@ class Listeo_Core_Emails {
 			'listing_url'  => get_permalink($booking['listing_id']),
 			'dates' => (isset($booking_data['dates'])) ? $booking_data['dates'] : '',
 			'details' => (isset($booking_data['details'])) ? $booking_data['details'] : '',
-			'service' => (isset($booking_data['service'])) ? $booking_data['service'] : '',
 			'tickets' => (isset($booking_data['tickets'])) ? $booking_data['tickets'] : '',
 			'adults' =>(isset($booking_data['adults'])) ? $booking_data['adults'] : '',
 			'children' => (isset($booking_data['children'])) ? $booking_data['children'] : '',
@@ -480,8 +443,12 @@ class Listeo_Core_Emails {
 	}
 
 	function welcome_mail($args){
-		$email 		=  $args['email'];
-
+		$email =  $args['email'];
+		$code  =  $args['code'];
+		$user_id = $args['user_id']; 
+		
+		$activation_link = get_the_permalink(3438).'?key='.$code.'&user_id='.$user_id;
+		
 		$args = array(
 			'email'         => $email,
 	        'login'         => $args['login'],
@@ -490,16 +457,18 @@ class Listeo_Core_Emails {
 	        'last_name' 	=> $args['last_name'],
 	        'user_name' 	=> $args['display_name'],
 			'user_mail' 	=> $email,
-			'login_url' 	=> $args['login_url'],
-			
+			'login_url' 	=> $args['login_url'],	
 			);
 		$subject 	 = get_option('listeo_listing_welcome_email_subject','Welcome to {site_name}!');
 		$subject 	 = $this->replace_shortcode( $args, $subject );
 
+		//$activation_link =  site_url().'/wp-content/webservices/registration-confirmation.php?key='.$code.'&user='.$user_id;
+		
 		$body 	 = get_option('listeo_listing_welcome_email_content','Welcome to {site_name}! You can log in {login_url}, your username: "{login}", and password: "{password}".');
 		
 		$body 	 = $this->replace_shortcode( $args, $body );
-		self::send( $email, $subject, $body );
+		
+		self::send( $email, $subject, $body , $activation_link  );
 	}
 
 
@@ -649,9 +618,6 @@ class Listeo_Core_Emails {
 			$booking_data['tickets'] = sprintf( _n( '%d Ticket', '%s Tickets', $details->tickets, 'listeo_core' ), $details->tickets );
 			$booking_details .= $booking_data['tickets'];
 		}
-		if (isset($details->service)) {
-			$booking_data['service'] = listeo_get_extra_services_html($details->service);
-		}
 		$booking_data['details'] = $booking_details;
 
 		return $booking_data;
@@ -660,7 +626,7 @@ class Listeo_Core_Emails {
 	/**
 	 * general function to send email to agent with specify subject, body content
 	 */
-	public static function send( $emailto, $subject, $body ){
+	public static function send( $emailto, $subject, $body , $activation_link=''){
 
 		$from_name 	= get_option('listeo_emails_name',get_bloginfo( 'name' ));
 		$from_email = get_option('listeo_emails_from_email', get_bloginfo( 'admin_email' ));
@@ -669,7 +635,6 @@ class Listeo_Core_Emails {
 		if( empty($emailto) || empty( $subject) || empty($body) ){
 			return ;
 		}
-		$subject = htmlentities(htmlspecialchars_decode($subject));
 		$template_loader = new listeo_core_Template_Loader;
 		ob_start();
 
@@ -679,13 +644,24 @@ class Listeo_Core_Emails {
 				padding-top: 28px; 
 				color: #666;
 				font-family: sans-serif;" class="paragraph">
-				<?php echo $body;?>
+				<?php 
+					echo $body;
+				?>
+				<?php
+					if($activation_link != '')
+					{
+						?>
+							<p> Your Account Activation Link : <a href="<?php echo $activation_link; ?>">here</a></p>
+							<p>If you are facing any problems with verifying link, try copying and pasting the below url to your browser</p>
+							<p><?php echo $activation_link; ?></p>
+						<?php 
+					}
+				?>
 				</td>
 			</tr>
 		<?php
 			$template_loader->get_template_part( 'emails/footer' ); 
-		$content = ob_get_clean();
-			
+			$content = ob_get_clean();
 		wp_mail( @$emailto, @$subject, @$content, $headers );
 
 	}
@@ -765,10 +741,8 @@ class Listeo_Core_Emails {
 							$conversation_url,
 		);
 	
-		$message = str_replace($tags, $values, $body);	
-		
+		$message = str_replace($tags, $values, $body);
 		$message = nl2br($message);
-		$message = htmlspecialchars_decode($message,ENT_QUOTES);
 
 		return $message;
 	}

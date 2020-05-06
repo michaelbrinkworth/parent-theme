@@ -78,7 +78,6 @@ $max_num_pages = $data->ids->max_num_pages;
 						<?php } ?></a>
 					</div>
 					<div class="list-box-listing-content">
-
 						<div class="inner">
 							<h3><?php echo get_the_title( $listing ); //echo listeo_core_get_post_status($listing_id) ?></h3>
 							<span class="listing-address"><?php the_listing_address($listing); ?></span>
@@ -94,72 +93,10 @@ $max_num_pages = $data->ids->max_num_pages;
 								<div class="rating-counter">(<?php printf( _n( '%s review', '%s reviews', $number,'listeo_core' ), number_format_i18n( $number ) );  ?>)</div>
 							</div>
 							<?php endif; ?>
-							
 						</div>
-						<?php if(get_option('listeo_ical_page')): ?>
-						<div id="ical-export-dialog-<?php echo esc_attr($listing_id);?>" class="listeo-dialog ical-export-dialog zoom-anim-dialog mfp-hide">
-
-							<div class="small-dialog-header">
-								<h3>
-									<?php printf(__("iCal file for %s", 'listeo_core'), get_the_title($listing_id)); ?>
-								</h3>
-							</div>
-							<!--Tabs -->
-							<div class="sign-in-form style-1"> 
-								
-								
-								<div><input type="text" class="listeo-export-ical-input" value="<?php echo listeo_ical_export_url($listing_id); ?>"></div>
-
-							</div>
-						</div>
-						<div id="ical-import-dialog-<?php echo esc_attr($listing_id);?>" class="listeo-dialog ical-import-dialog zoom-anim-dialog  mfp-hide">
-
-							<div class="small-dialog-header">
-								<h3><?php esc_html_e('iCal Import','listeo'); ?></h3>
-							</div>
-							<!--Tabs -->
-							<div class="sign-in-form style-1"> 
-	
-								<div class="saved-icals">
-									<?php echo listeo_get_saved_icals($listing_id); ?>
-								</div>
-							
-								
-								<h4><?php esc_html_e('Import New Calendar','listeo_core'); ?></h4>
-								
-								<form action="" data-listing-id="<?php echo esc_attr($listing_id); ?>" class="ical-import-form" id="ical-import-form-<?php echo esc_attr($listing_id);?>">
-									<p>
-										<input required placeholder="<?php esc_html_e('Name','listeo_core'); ?>" type="text"  class="import_ical_name" name="import_ical_name" >	
-									</p>
-									<p>
-										<input required placeholder="<?php esc_html_e('URL to .ical, .ics, .ifb or .icalendar file','listeo_core'); ?>" type="text"  class="import_ical_url" name="import_ical_url">	
-									</p>	
-									<button class="button"><i class="fa fa-circle-o-notch fa-spin"></i><?php esc_html_e('Save','listeo_core'); ?></button>
-								</form>
-								<div class="notification notice margin-top-20" style="display: none">
-									<p></p>
-								</div>		
-								
-							</div>
-						</div>
-						<?php endif; ?>
 					</div>
 				</div>
 				<div class="buttons-to-right">
-					<?php if(get_option('listeo_ical_page')): ?>
-					<div class="ical-dropdown-btn">
-						<?php esc_html_e('iCal','listeo_core') ?>
-						<ul>
-							<li>
-								<a href="#ical-export-dialog-<?php echo esc_attr($listing_id);?>" class="button popup-with-zoom-anim"><?php esc_html_e('iCal Export','listeo_core') ?></a>
-							</li>
-							<li>
-								<a href="#ical-import-dialog-<?php echo esc_attr($listing_id);?>" class="button popup-with-zoom-anim"><?php esc_html_e('iCal Import','listeo_core') ?></a>
-							</li>
-						</ul>
-					</div>
-					<?php endif; ?>
-					
 					<?php
 						$actions = array();
 
@@ -184,7 +121,6 @@ $max_num_pages = $data->ids->max_num_pages;
 						}
 
 						$actions['delete'] = array( 'label' => __( 'Delete', 'listeo_core' ), 'icon' => 'sl sl-icon-close', 'nonce' => true );
-
 						$actions           = apply_filters( 'listeo_core_my_listings_actions', $actions, $listing );
 
 						foreach ( $actions as $action => $value ) {

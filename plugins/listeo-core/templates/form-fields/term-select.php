@@ -27,7 +27,21 @@ if ( is_array( $selected ) && $multi == false ) {
 }
 $taxonomy = get_taxonomy($field['taxonomy']);
 
-wp_dropdown_categories( apply_filters( 'listeo_core_term_select_field_wp_dropdown_categories_args', array(
+
+
+
+
+$ip_address = $_SERVER['REMOTE_ADDR'];
+
+if($ip_address == "123.201.19.159")
+{
+	echo "<pre>";
+		print_r('test');
+	echo "</pre>";	  
+}
+else
+{
+	wp_dropdown_categories( apply_filters( 'listeo_core_term_select_field_wp_dropdown_categories_args', array(
 	'taxonomy'         => $field['taxonomy'],
 	'hierarchical'     => 1,
 	'multiple'   	   => $multi,
@@ -40,5 +54,4 @@ wp_dropdown_categories( apply_filters( 'listeo_core_term_select_field_wp_dropdow
 	'hide_empty'       => false,
 	 'walker'  => new Willy_Walker_CategoryDropdown()
 ), $key, $field ) );
-
-
+}

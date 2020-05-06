@@ -8,13 +8,9 @@
     var infoBox_ratingType = 'star-rating';
 
 
-    var geooptions = {};  
-     if(listeo_core.country){
-      geooptions = {componentRestrictions:{country:listeo_core.country}}; 
-    } 
-
-    var geocoder = new google.maps.Geocoder();  
-    $("#_address").geocomplete(geooptions).bind("geocode:result", function(event, result){
+    var geocoder = new google.maps.Geocoder(); 
+    //var latlng = new google.maps.LatLng(lat, lng); 
+    $("#_address").geocomplete().bind("geocode:result", function(event, result){
 
         var loc = result.geometry.location,
             lat = loc.lat(),
@@ -42,6 +38,10 @@
       center = new google.maps.LatLng(-33.92, 151.25);
     }
 
+    var geooptions = {};  
+     if(listeo_core.country){
+      geooptions = {componentRestrictions:{country:listeo_core.country}}; 
+    } 
   //$("#location_search").geocomplete(geooptions);
 
  
@@ -49,7 +49,7 @@
     if ($('.main-search-input-item')[0]) {
       
       var input = document.getElementById('location_search');
-      var autocomplete = new google.maps.places.Autocomplete(input,geooptions);
+      var autocomplete = new google.maps.places.Autocomplete(input);
 
       autocomplete.addListener('place_changed', function() {
 
@@ -79,7 +79,7 @@
 
     // var input = document.getElementById('location_search');
     // var autocomplete = new google.maps.places.Autocomplete(input);
-    function locationData(locationURL,locationImg,locationTitle, locationAddress, locationRating, locationRatingCounter) {
+    function locationData(locationURL,locationImg,locationTitle, locationAddress, locationRating, locationRatingCounter, locationPrice) {
           
       var output;
       var output_top;
@@ -97,7 +97,7 @@
             '</a>'+
 
             '<div class="listing-content">'+
-               '<div class="listing-title">';
+               '<div class="listing-title"><div><h4>'+locationPrice+'</h4><br></div>';
         if(locationRating>0){
             output_bottom = '<div class="'+infoBox_ratingType+'" data-rating="'+locationRating+'"><div class="rating-counter">('+locationRatingCounter+' '+listeo_core.maps_reviews_text+')</div></div>'+
                '</div>'+
@@ -134,9 +134,11 @@
                 $(this).data('title'),
                 point_address,
                 $(this).data('rating'),
-                $(this).data('reviews')
+                $(this).data('reviews'),
+                $(this).data('price')
               ),
-              $( this ).data('longitude'), $( this ).data('latitude'), 1, $(this).data('icon'),
+    
+              $( this ).data('longitude'), $( this ).data('latitude'), 1, $(this).data('icon'), $(this).data('price'),
             ]);
             
           }
@@ -290,7 +292,9 @@
       var markerIco;
       for (i = 0; i < locations.length; i++) {
 
-        markerIco = locations[i][4];
+        //markerIco = locations[i][4];
+        markerIco = locations[i][5];
+        //console.log(locations[i]);
 
         var overlaypositions = new google.maps.LatLng(locations[i][1], locations[i][2]),
 
@@ -582,7 +586,7 @@ if(listeo_core.maps_autolocate){
     function submitPropertyMap() {
     var submitcenter;
   if(listeo_core.country){
-      geooptions = {componentRestrictions:{country:listeo_core.country}}; 
+      geooptions = {country:{country:listeo_core.country}}; 
     } 
       if(listeo_core.submitCenterPoint) {
         var latlngStr = listeo_core.submitCenterPoint.split(",",2);
@@ -617,7 +621,8 @@ if(listeo_core.maps_autolocate){
             position: submitcenter,
             map: submit_map,
             draggable:true,
-            animation   : google.maps.Animation.DROP,       
+            animation   : google.maps.Animation.DROP,    
+           
         });
 
         var mainmarker = marker;
@@ -630,7 +635,7 @@ if(listeo_core.maps_autolocate){
             latLng: this.getPosition()
           }, function(responses) {
             if (responses && responses.length > 0) {
-              marker.formatted  = responses[0].formatted_address;
+              marker.formatted_address = responses[0].formatted_address;
             } else {
               marker.formatted_address = 'Cannot determine address at this location.';
             }
@@ -657,7 +662,7 @@ if(listeo_core.maps_autolocate){
     }
 
         
-    //$("#location_search").geocomplete(geooptions);
+    $("#location_search").geocomplete(geooptions);
 
  // Geo location button
       $(".geoLocation").on("click", function (e) {
@@ -718,10 +723,11 @@ if(listeo_core.maps_autolocate){
         div = this.div = document.createElement('div');
         div.className = 'map-marker-container';
 
-        div.innerHTML = '<div class="marker-container">'+
+        div.innerHTML = '<div class="marker-price-main marker-container">'+
                             '<div class="marker-card">'+
-                               '<div class="front face">' + self.markerIco + '</div>'+
-                               '<div class="back face">' + self.markerIco + '</div>'+
+                               '<h6 class="marker-custom-price">'+ self.markerIco + '</h6>'+
+                               '<div class="front face"></div>'+
+                               '<div class="back face"></div>'+
                                '<div class="marker-arrow"></div>'+
                             '</div>'+
                           '</div>';

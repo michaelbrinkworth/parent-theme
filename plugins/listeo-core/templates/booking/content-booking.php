@@ -70,10 +70,8 @@ switch ($data->status) {
 
 ?>
 <li class="<?php echo implode(' ',$class); ?>" id="booking-list-<?php echo esc_attr($data->ID);?>">
-	
-	
 	<div class="list-box-listing bookings">
-		<div class="list-box-listing-img"><a href="<?php echo get_author_posts_url($data->bookings_author); ?>"><?php echo get_avatar($data->bookings_author, '70') ?></a></div>
+		<div class="list-box-listing-img"><?php echo get_avatar($data->bookings_author, '70') ?></div>
 		<div class="list-box-listing-content">
 			<div class="inner">
 				<h3 id="title"><a href="<?php echo get_permalink($data->listing_id); ?>"><?php echo get_the_title($data->listing_id); ?></a> <?php echo implode(' ',$tag); ?></h3>
@@ -94,8 +92,7 @@ switch ($data->status) {
 							<li class="highlighted" id="date">
 
 								<?php echo date_i18n(get_option( 'date_format' ), strtotime($data->date_start)); ?> 
-								
-								<?php 
+									<?php 
 									$event_start = get_post_meta($data->listing_id,'_event_date', true); 
 									$event_date = explode(' ', $event_start); 
 									if( isset($event_date[1]) ) { ?>
@@ -160,8 +157,7 @@ switch ($data->status) {
 					<h5><?php esc_html_e('Client:', 'listeo_core'); ?></h5>
 					<ul class="booking-list" id="client">
 						<?php if( isset($details->first_name) || isset($details->last_name) ) : ?>
-						<li id="name">
-							<a href="<?php echo get_author_posts_url($data->bookings_author); ?>"><?php if(isset($details->first_name)) echo $details->first_name; ?> <?php if(isset($details->last_name)) echo $details->last_name; ?></a></li>
+						<li id="name"><?php if(isset($details->first_name)) echo $details->first_name; ?> <?php if(isset($details->last_name)) echo $details->last_name; ?></li>
 						<?php endif; ?>
 						<?php if( isset($details->email)) : ?><li id="email"><a href="mailto:<?php echo esc_attr($details->email) ?>"><?php echo $details->email; ?></a></li>
 						<?php endif; ?>
@@ -173,7 +169,7 @@ switch ($data->status) {
 				<?php if( isset($details->service) && !empty($details->service)) : ?>
 					<div class="inner-booking-list">
 						<h5><?php esc_html_e('Extra Services:', 'listeo_core'); ?></h5>
-						<?php echo listeo_get_extra_services_html($details->service); //echo wpautop( $details->service); ?>
+						<?php echo wpautop( $details->service); ?>
 					</div>	
 				<?php endif; ?>
 				<?php if( isset($details->message) && !empty($details->message)) : ?>
@@ -188,14 +184,8 @@ switch ($data->status) {
 					<h5><?php esc_html_e('Request sent:', 'listeo_core'); ?></h5>
 					<ul class="booking-list">
 						<li class="highlighted" id="price">
-							<?php echo date_i18n(get_option( 'date_format' ), strtotime($data->created)); ?>
-							<?php 
-								$date_created = explode(' ', $data->created); 
-									if( isset($date_created[1]) ) { ?>
-									<?php esc_html_e('at','listeo_core'); ?>
-									
-							<?php echo date_i18n(get_option( 'time_format' ), strtotime($date_created[1])); } ?>
-						</li>
+							<?php echo date_i18n(get_option( 'date_format' ), strtotime($data->created)); ?> <?php esc_html_e('at','listeo_core'); ?> <?php echo date_i18n(get_option( 'time_format' ), strtotime($data->created)); ?>
+							</li>
 					</ul>
 				</div>	
 

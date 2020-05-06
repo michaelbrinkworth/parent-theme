@@ -171,7 +171,7 @@ if(isset($data->order_id) && !empty($data->order_id) && $data->status == 'confir
 				<?php if( isset($details->service) && !empty($details->service)) : ?>
 					<div class="inner-booking-list">
 						<h5><?php esc_html_e('Extra Services:', 'listeo_core'); ?></h5>
-						<?php echo listeo_get_extra_services_html($details->service); //echo wpautop( $details->service); ?>
+						<?php echo wpautop( $details->service); ?>
 					</div>	
 				<?php endif; ?>
 				<?php if( isset($details->message) && !empty($details->message)) : ?>
@@ -184,21 +184,11 @@ if(isset($data->order_id) && !empty($data->order_id) && $data->status == 'confir
 				<div class="inner-booking-list">
 					<h5><?php esc_html_e('Booking requested on:', 'listeo_core'); ?></h5>
 					<ul class="booking-list">
-						<li class="highlighted" id="price">
-							<?php echo date_i18n(get_option( 'date_format' ), strtotime($data->created)); ?>
-							<?php 
-								$date_created = explode(' ', $data->created); 
-									if( isset($date_created[1]) ) { ?>
-									<?php esc_html_e('at','listeo_core'); ?>
-									
-							<?php echo date_i18n(get_option( 'time_format' ), strtotime($date_created[1])); } ?>
-						</li>
+						<li class="highlighted" id="price"><?php echo $data->created ?> <z</li>
 					</ul>
 				</div>	
 
 				<a href="#small-dialog" data-recipient="<?php echo esc_attr($data->owner_id); ?>" data-booking_id="booking_<?php echo esc_attr($data->ID); ?>" class="booking-message rate-review popup-with-zoom-anim"><i class="sl sl-icon-envelope-open"></i> <?php esc_attr_e('Send Message','listeo_core') ?></a>
-
-				
 
 			</div>
 		</div>

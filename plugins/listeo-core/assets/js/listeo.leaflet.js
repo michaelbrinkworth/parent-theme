@@ -547,7 +547,7 @@ $(document).ready(function(){
         );
         var mapOptions = {
             center: [lat,lng],
-            zoom: listeo_core.maps_single_zoom,
+            zoom: 13,
             zoomControl: false,
             gestureHandling: true
          }

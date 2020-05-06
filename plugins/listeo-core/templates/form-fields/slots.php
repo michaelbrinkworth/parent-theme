@@ -80,8 +80,8 @@ $int = 0;
 				<input type="text"  class="time-slot-start slot-time-input"  placeholder="--:--" maxlength="5" size="5" />
 				<?php if( $clock_format == '12'){ ?>
 				<select class="time-slot-start twelve-hr" id="">
-					<option><?php esc_html_e('am','listeo_core'); ?></option>
-					<option><?php esc_html_e('pm','listeo_core'); ?></option>
+					<option><?php esc_html_e('am'); ?></option>
+					<option><?php esc_html_e('pm'); ?></option>
 				</select>
 				<?php } ?>
 
@@ -91,8 +91,8 @@ $int = 0;
 				<input type="text"  class="time-slot-end slot-time-input"  placeholder="--:--" maxlength="5" size="5" />
 				<?php if( $clock_format == '12'){ ?>
 				<select class="time-slot-end twelve-hr" id="">
-					<option><?php esc_html_e('am','listeo_core'); ?></option>
-					<option><?php esc_html_e('pm','listeo_core'); ?></option>
+					<option><?php esc_html_e('am'); ?></option>
+					<option><?php esc_html_e('pm'); ?></option>
 				</select>
 				<?php } ?>
 

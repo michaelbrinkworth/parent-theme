@@ -4,6 +4,9 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
+
+
+
 if(isset($_GET["action"]) && $_GET["action"] == 'edit' && !listeo_core_if_can_edit_listing($data->listing_id) ){ ?>
 	<div class="notification closeable notice">
 		<?php esc_html_e('You can\'t edit that listing' , 'listeo_core');?>
@@ -64,11 +67,9 @@ endif;
 		</div>
 	<?php }
 	?>
-<form action="<?php  echo esc_url( $data->action ); ?>" method="post" id="submit-listing-form" class="listing-manager-form" enctype="multipart/form-data">
-	
+<form onSubmit="javascript:return check_listing_description_validation();" action="<?php  echo esc_url( $data->action ); ?>" method="post" id="submit-listing-form" class="listing-manager-form" enctype="multipart/form-data">
 
 <?php
-
  foreach ( $fields as $key => $section ) :  
 
   ?>
@@ -203,3 +204,37 @@ endif;
 	
 </form>
 </div>
+<script>
+function check_listing_description_validation() {
+	 if (jQuery('#listing_title').hasClass('invalid_listing_title') ) {
+	 	document.getElementById("listing_title").focus();
+	 	return false;		
+	 }
+	 else if (jQuery('#listing_description').hasClass('invalid_listing_description') ) {
+	 	document.getElementById("listing_description").focus();
+	 	return false;		
+	 }
+	 else if (jQuery('#_normal_price').hasClass('invalid_listing_price') ) {
+	 	document.getElementById("_normal_price").focus();
+	 	return false;		
+	 }
+
+	 else {
+	  	return true;
+	 }
+}
+
+	/*if(jQuery("#listing_title").val() == "")
+	{
+		jQuery("#listing_title").addClass("invalid_listing_title");
+	}
+
+	if(jQuery("#_normal_price").val() == "" || jQuery("#_normal_price").val() <= 0)
+	{
+		jQuery("#listing_title").addClass("invalid_listing_price");
+	}*/
+
+	// if(jQuery("#media-uploader-ids"))
+
+
+</script>

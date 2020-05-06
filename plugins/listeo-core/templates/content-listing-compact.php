@@ -10,19 +10,24 @@ $is_featured = listeo_core_is_featured($post->ID);  ?>
 <!-- Listing Item -->
 <?php if(isset($style) && $style == 'compact') {
     if($columns == 3) { ?>
-        <div class="col-lg-4 col-md-6"> 
+        <div class="col-lg-4 col-md-6 t2"> 
     <?php } else {?>
         <div class="col-lg-6 col-md-12"> 
     <?php } 
 }?>
-<a href="<?php the_permalink(); ?>" class="listing-item-container listing-geo-data compact" <?php echo listeo_get_geo_data($post); ?> >
-	<div class="listing-item  <?php if($is_featured){ ?>featured-listing<?php } ?>">
+<!--<a href="<?php the_permalink(); ?>" class="listing-item-container listing-geo-data compact" <?php echo listeo_get_geo_data($post); ?> >-->
+<div class="listing-item-container listing-geo-data compact" <?php echo listeo_get_geo_data($post); ?> >
+	<div class="listing-item listeo_compact_view_item <?php if($is_featured){ ?>featured-listing<?php } ?>">
 		<div class="listing-small-badges-container">
             <?php if($is_featured){ ?>
                 <div class="listing-small-badge featured-badge"><i class="fa fa-star"></i> <?php esc_html_e('Featured','listeo_core'); ?></div>
             <?php } ?>
-            <?php if(get_the_listing_price_range()): ?>
-                <div class="listing-small-badge pricing-badge"><i class="fa fa-<?php echo esc_attr(get_option('listeo_price_filter_icon','tag')); ?>"></i><?php echo get_the_listing_price_range(); ?></div>
+            <?php if(get_the_listing_regular_price()): ?>
+                <div class="listing-small-badge pricing-badge"><i class="fa fa-<?php echo esc_attr(get_option('listeo_price_filter_icon','tag')); ?>"></i>
+                <?php 
+                	//echo get_the_listing_price_range();  
+                	echo get_the_listing_regular_price();
+                ?></div>
             <?php endif; ?>
             <?php  
             if( $listing_type  == 'event') { 
@@ -66,7 +71,11 @@ $is_featured = listeo_core_is_featured($post->ID);  ?>
 				<?php endif;
             } ?>
     
-			 <h3><?php the_title(); ?> <?php if( get_post_meta($post->ID,'_verified',true ) == 'on') : ?><i class="verified-icon"></i><?php endif; ?></h3>
+			 <h3 class="listeo_single_list_title">
+			 	<a target="_blank" href="<?php the_permalink(); ?>">
+			 		<?php the_title(); ?> <?php if( get_post_meta($post->ID,'_verified',true ) == 'on') : ?><i class="verified-icon"></i><?php endif; ?>
+			 	</a>
+			 </h3>
             <?php if(get_the_listing_address()) { ?><span><?php the_listing_address(); ?></span><?php } ?>
 
 		</div>
@@ -87,7 +96,8 @@ $is_featured = listeo_core_is_featured($post->ID);  ?>
                 <?php } ?>
         <?php } ?>
 	</div>
-</a>
+<!--</a>-->
+</div>
 <?php if(isset($style) && $style == 'compact') { ?>
     </div>
 <?php } ?>

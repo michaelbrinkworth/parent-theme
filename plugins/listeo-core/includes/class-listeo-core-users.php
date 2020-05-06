@@ -143,7 +143,7 @@ class Listeo_Core_Users {
 	
 	function listeo_wp_admin_user_register( $user_id ) {
 
-	   $user_id = wp_update_user( array( 'ID' => $user_id, 'role' => $_POST['user_role'] ) );
+	   $user_id = wp_update_user( array( 'ID' => $user_id, 'role' => $_POST['role'] ) );
 	}
 
 	function listeo_register_form() {
@@ -239,25 +239,44 @@ class Listeo_Core_Users {
 	        		'message'=>esc_html__('Wrong username or password.','listeo_core')
 	        	)
 	        );
+	        die();
 
 	    } else {
-	    	wp_clear_auth_cookie();
-          //  do_action('wp_login', $user_signon->ID);
-            wp_set_current_user($user_signon->ID);
-            wp_set_auth_cookie($user_signon->ID, true);
-	        echo json_encode(
+	    	
+	    	if($user_signon->user_status == 1)
+	    	{
+				wp_clear_auth_cookie();
+	          	// do_action('wp_login', $user_signon->ID);
+	            wp_set_current_user($user_signon->ID);
+	            wp_set_auth_cookie($user_signon->ID, true);
+		        echo json_encode(
 
-	        	array(
-	        		'loggedin'	=>	true, 
-	        		'message'	=>	esc_html__('Login successful, redirecting...','listeo_core'),
-	        	
-	        	)
+		        	array(
+		        		'loggedin'	=>	true, 
+		        		'message'	=>	esc_html__('Login successful, redirecting...','listeo_core'),
+		        	)
 
-	        );
+		        );
+		        die();	
+			}
+			else
+			{
+				$sessions = WP_Session_Tokens::get_instance($user_signon->ID);
+				$sessions->destroy_all();
+				
+		        echo json_encode(
+		        	array(
+		        		'loggedin'	=>	false, 
+		        		'message'	=>	esc_html__('Your email not activated! please active your email','listeo_core'),
+		        	)
+
+		        );
+		        die();
+			}
+	    	die();
 
 	    }
-
-	    die();
+		
 	}
 
 	function ajax_get_header_part(){
@@ -478,10 +497,8 @@ class Listeo_Core_Users {
 		        //your site secret key
 		        $secret = get_option('listeo_recaptcha_secretkey');
 		        //get verify response data
-		        //$verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$secret.'&response='.$_POST['g-recaptcha-response']);
-		        $verifyResponse = wp_remote_get('https://www.google.com/recaptcha/api/siteverify?secret='.$secret.'&response='.$_POST['g-recaptcha-response']);
-				$responseData_w = wp_remote_retrieve_body( $verifyResponse );
-		        $responseData = json_decode($responseData_w);
+		        $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$secret.'&response='.$_POST['g-recaptcha-response']);
+		        $responseData = json_decode($verifyResponse);
 				if( $responseData->success ):
 					//passed captcha, proceed to register
 		            // 
@@ -1320,13 +1337,7 @@ class Listeo_Core_Users {
 	        }
 	    } else {
 	        // Non-admin users always go to their account page after login
-	        
-	        $org_ref = wp_get_referer();
-	        if($org_ref){
-	        	$redirect_url = $org_ref;
-	        } else {
-	        	$redirect_url = get_permalink(get_option( 'listeo_profile_page' ));
-	        }
+	        $redirect_url = get_permalink(get_option( 'listeo_profile_page' ));
 	    }
 	 
 	    return wp_validate_redirect( $redirect_url, home_url() );
@@ -1379,7 +1390,20 @@ class Listeo_Core_Users {
 	    $user_id = wp_insert_user( $user_data );
 
 	    if ( ! is_wp_error( $user_id ) ) {
-			wp_new_user_notification( $user_id, $password,'both' );
+			$code = sha1( $user_id . time() );
+			
+			global $wpdb;
+			$user_table_name = $wpdb->prefix . 'users';
+	        $wpdb->update(
+	            $user_table_name,
+	                array( 'user_activation_key' => $code),
+	                array( 'ID' => $user_id ),
+	                array( '%s')
+	            );
+			
+			update_user_meta($user_id, 'account_activated', 0);
+    		update_user_meta($user_id, 'activation_code', $code);	
+			wp_new_user_notification( $user_id, $password,'both',$code );
 			if(get_option('listeo_autologin')){
 				wp_set_current_user($user_id); // set the current wp user
 	    		wp_set_auth_cookie($user_id); 	
@@ -1439,9 +1463,8 @@ class Listeo_Core_Users {
 				        //your site secret key
 				        $secret = get_option('listeo_recaptcha_secretkey');
 				        //get verify response data
-				 
-				        $verifyResponse = wp_remote_get('https://www.google.com/recaptcha/api/siteverify?secret='.$secret.'&response='.$_POST['g-recaptcha-response']);
-				        $responseData = json_decode($verifyResponse['body']);
+				        $verifyResponse = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret='.$secret.'&response='.$_POST['g-recaptcha-response']);
+				        $responseData = json_decode($verifyResponse);
 						if( $responseData->success ):
 							//passed captcha, proceed to register
 				            $result = $this->register_user( $email,  $user_login, $first_name, $last_name, $role, $password );
@@ -1578,7 +1601,7 @@ if(!is_admin()) {
 
 // Redefine user notification function
 if ( !function_exists('wp_new_user_notification') ) {
-    function wp_new_user_notification( $user_id, $plaintext_pass = '' ) {
+    function wp_new_user_notification( $user_id, $plaintext_pass = '',$both='',$code ) {
         $user = new WP_User($user_id);
  
         $user_login = stripslashes($user->user_login);
@@ -1621,6 +1644,8 @@ if ( !function_exists('wp_new_user_notification') ) {
 	        'last_name' 	=> $user->last_name,
 	        'display_name' 	=> $user->display_name,
 	        'login_url' 	=> $login_url,
+	        'user_id'		=> $user_id,
+	        'code'			=> $code,
 	        );
 	    do_action('listeo_welcome_mail',$mail_args);
 

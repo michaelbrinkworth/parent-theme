@@ -5,8 +5,10 @@ $listing_type = get_post_meta( $post->ID,'_listing_type',true ); ?>
 <!-- Listing Item -->
 
 	<div class="col-lg-12 col-md-12">
-		<div class="listing-item-container listing-geo-data  list-layout <?php echo esc_attr('listing-type-'.$listing_type) ?>" <?php echo listeo_get_geo_data($post); ?> >
-			<a href="<?php the_permalink(); ?>" class="listing-item <?php if($is_featured){ ?>featured-listing<?php } ?>">
+		<div class="listeo-item-main-listview listing-item-container listing-geo-data  list-layout <?php echo esc_attr('listing-type-'.$listing_type) ?>" <?php echo listeo_get_geo_data($post); ?> >
+			<!--<a href="<?php the_permalink(); ?>" class="listing-item <?php if($is_featured){ ?>featured-listing<?php } ?>">-->
+			
+			<div class="listing-item listeo_listview_item <?php if($is_featured){ ?>featured-listing<?php } ?>">
 				 <div class="listing-small-badges-container">
 		            <?php if($is_featured){ ?>
 		                <div class="listing-small-badge featured-badge"><i class="fa fa-star"></i> <?php esc_html_e('Featured','listeo_core'); ?></div><br>
@@ -42,10 +44,12 @@ $listing_type = get_post_meta( $post->ID,'_listing_type',true ); ?>
 			                    <?php } ?>
 			            <?php } 
 			        }?>
-					<div class="listing-item-inner">
-						<h3>
-							<?php the_title(); ?> 
-							<?php if( get_post_meta($post->ID,'_verified',true ) == 'on') : ?><i class="verified-icon"></i><?php endif; ?>
+					<div class="listing-item-inner listo-new-list2">
+						<h3 class="listeo_single_list_title">
+							<a target="_blank" href="<?php the_permalink(); ?>">
+								<?php the_title(); ?> 
+								<?php if( get_post_meta($post->ID,'_verified',true ) == 'on') : ?><i class="verified-icon"></i><?php endif; ?>
+							</a>
 						</h3>
 						<span><?php the_listing_location_link($post->ID, false); ?></span>
 						
@@ -57,7 +61,7 @@ $listing_type = get_post_meta( $post->ID,'_listing_type',true ); ?>
 								if($rating_type == 'numerical') { ?>
 									<div class="numerical-rating" data-rating="<?php $rating_value = esc_attr(round($rating,1)); printf("%0.1f",$rating_value); ?>">
 								<?php } else { ?>
-									<div class="star-rating" data-rating="<?php echo $rating; ?>">
+									<div class="star-rating new2-star2" data-rating="<?php echo $rating; ?>">
 								<?php } ?>
 									<?php $number = listeo_get_reviews_number($post->ID);  ?>
 									<div class="rating-counter">(<?php printf( _n( '%s review', '%s reviews', $number,'listeo_core' ), number_format_i18n( $number ) );  ?>)</div>
@@ -68,9 +72,15 @@ $listing_type = get_post_meta( $post->ID,'_listing_type',true ); ?>
 						<?php if($listing_type  == 'event' || get_the_listing_price_range() ) : ?>
 						<div class="listing-list-small-badges-container">
 						<?php  endif; ?>
-							<?php if(get_the_listing_price_range()): ?>
-				                <div class="listing-small-badge pricing-badge"><i class="fa fa-<?php echo esc_attr(get_option('listeo_price_filter_icon','tag')); ?>"></i><?php echo get_the_listing_price_range(); ?></div>
-				            <?php endif; ?>
+							<?php if(get_the_listing_regular_price()): ?>
+				                <div class="listing-small-badge pricing-badge listo-new2-list-price"
+				                	<i class="fa fa-<?php echo esc_attr(get_option('listeo_price_filter_icon','tag')); ?>"></i>
+				                	<?php 
+				                		//echo get_the_listing_price_range(); 
+				                		echo get_the_listing_regular_price();
+				                	?>
+				                </div>
+				        	<?php  endif; ?>    
 				            <?php  
 				            if( $listing_type  == 'event') { 
 				                $date_format = listeo_date_time_wp_format_php();
@@ -98,22 +108,23 @@ $listing_type = get_post_meta( $post->ID,'_listing_type',true ); ?>
 					<?php 
 		       		if( listeo_core_check_if_bookmarked($post->ID) ) { 
 		                $nonce = wp_create_nonce("listeo_core_bookmark_this_nonce"); ?>
-		                <span class="like-icon listeo_core-unbookmark-it liked"
+		                <span class="like-icon listeo_core-unbookmark-it liked listo2-list2-like-icon"
 		                data-post_id="<?php echo esc_attr($post->ID); ?>" 
 		                data-nonce="<?php echo esc_attr($nonce); ?>" ></span>
 		            <?php } else { 
 		                if(is_user_logged_in()){ 
 		                    $nonce = wp_create_nonce("listeo_core_remove_fav_nonce"); ?>
-		                    <span class="save listeo_core-bookmark-it like-icon" 
+		                    <span class="save listeo_core-bookmark-it like-icon listo2-list2-like-icon" 
 		                    data-post_id="<?php echo esc_attr($post->ID); ?>" 
 		                    data-nonce="<?php echo esc_attr($nonce); ?>" ></span>
 		                <?php } else { ?>
-		                    <span class="save like-icon tooltip left"  title="<?php esc_html_e('Login To Bookmark Items','listeo_core'); ?>"   ></span>
+		                    <span class="save like-icon tooltip left listo2-list2-like-icon"  title="<?php esc_html_e('Login To Bookmark Items','listeo_core'); ?>"   ></span>
 		                <?php } ?>
 		        	<?php } ?>
 		        	
 				</div>
-			</a>
+			<!--</a>-->
+			</div>
 		</div>
 	</div>
 

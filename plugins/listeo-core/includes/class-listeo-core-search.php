@@ -736,10 +736,10 @@ public function ajax_get_listings() {
 				}
 				if($cat_object){
 					$features_temp = get_term_meta($cat_object->term_id,'listeo_taxonomy_multicheck',true);
+					
 					if($features_temp) {
 						$features = array_merge($features,$features_temp);
 					}
-					$features = array_unique($features);
 					
 				}
 			}
@@ -821,6 +821,7 @@ public function ajax_get_listings() {
 				}
 			}
 		};
+		
 		ob_start();
 
 		if($categories){
@@ -832,19 +833,13 @@ public function ajax_get_listings() {
 				} else {
 					$cat_object = get_term_by('slug', $category, 'listing_category');	
 				}
-
 				if($cat_object){
-					$features_temp = get_term_meta( $cat_object->term_id, 'listeo_taxonomy_multicheck', true );
-					foreach ($features_temp as $key => $value) {
-						$features[] = $value;
+					$features_temp = get_term_meta($cat_object->term_id,'listeo_taxonomy_multicheck',true);
+					if($features_temp) {
+						$features += $features_temp;
 					}
-					
-					// if($features_temp) {
-					// 	$features = $features + $features_temp;
-					// }
 				}
 			}
-			
 			$features = array_unique($features);
 
 			if($features){
@@ -881,7 +876,7 @@ public function ajax_get_listings() {
 							continue;
 						}
 						?>
-						<input <?php if($selected) checked( in_array(  $feature_obj->term_id, $selected ) ); ?>value="<?php echo esc_html($feature_obj->term_id) ?>" type="checkbox" id="in-listing_feature-<?php echo esc_html($feature_obj->term_id) ?>" name="tax_input[listing_feature][]" >
+						<input <?php checked( in_array(  $feature_obj->term_id, $selected ) ); ?>value="<?php echo esc_html($feature_obj->term_id) ?>" type="checkbox" id="in-listing_feature-<?php echo esc_html($feature_obj->term_id) ?>" name="tax_input[listing_feature][]" >
 						<label id="label-in-listing_feature-<?php echo esc_html($feature_obj->term_id) ?>" for="in-listing_feature-<?php echo esc_html($feature_obj->term_id) ?>"><?php echo $feature_obj->name; ?></label>
 					<?php }
 				}
@@ -1293,7 +1288,7 @@ public function ajax_get_listings() {
 		
 		ob_start();	
 		if($wrap_with_form == 'yes') { ?>
-		<form action="<?php echo $action; ?>" id="listeo_core-search-form" class="<?php if($dynamic_filters == 'on') { echo esc_attr('dynamic'); }  ?> <?php echo esc_attr($custom_class) ?> <?php echo esc_attr($ajax) ?>" method="GET">
+		<form action="<?php echo $action; ?>" id="listeo_core-search-form" class="t1 <?php if($dynamic_filters == 'on') { echo esc_attr('dynamic'); }  ?> <?php echo esc_attr($custom_class) ?> <?php echo esc_attr($ajax) ?>" method="GET">
 		<?php } 
 		if( in_array($source, array('home')) ) { ?>
 			<div class="main-search-input">
@@ -1426,7 +1421,7 @@ public function ajax_get_listings() {
 							<!-- Panel Dropdown -->
 							<div class="panel-dropdown <?php if( $value['type'] == 'multi-checkbox-row') { echo "wide"; } if($value['type'] == 'radius') { echo 'radius-dropdown'; } ?> " id="<?php echo esc_attr( $value['name']); ?>-panel">
 								<a href="#"><?php echo esc_html($value['placeholder']); ?></a>
-								<div class="panel-dropdown-content <?php if( $value['type'] == 'multi-checkbox-row') { echo "checkboxes"; } ?> <?php if(isset($value['dynamic']) && $value['dynamic']=='yes'){ echo esc_attr('dynamic'); }?>">
+								<div class="panel-dropdown-content <?php if( $value['type'] == 'multi-checkbox-row') { echo "checkboxes"; } ?> <?php if(isset($value['dynamic']) && $value['dynamic']=='yes'){ echo esc_attr('dynamic'); }?>" style="width:350px;">
 							<?php } 
 							
 							$template_loader->set_template_data( $value )->get_template_part( 'search-form/'.$value['type']); 

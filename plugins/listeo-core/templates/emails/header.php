@@ -65,13 +65,12 @@ a, a:hover {
 		<?php 
 		$logo = get_option( 'pp_logo_upload', '' ); 
 		if($logo) { ?>
-			 <a style="border: none;" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img border="0" vspace="0" hspace="0"
+			<img border="0" vspace="0" hspace="0"
 				src="<?php echo get_option( 'pp_logo_upload', '' );  ?>"
-
 				alt="<?php  bloginfo( 'name' ); ?>" title="<?php  bloginfo( 'name' ); ?>" style="
 				color: #333;
 				max-height: 50px; transform: translate3d(0,0,0);
-				font-size: 10px; margin: 10px 0; padding: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: block;" /></a>
+				font-size: 10px; margin: 10px 0; padding: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; border: none; display: block;" />
 		<?php } else { 
 			echo "<h3>"; bloginfo( 'name' ); echo "</h3>"; 
 		} ?>

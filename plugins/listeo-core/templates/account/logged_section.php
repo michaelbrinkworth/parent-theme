@@ -26,11 +26,6 @@ $my_account_display = get_option('listeo_my_account_display', true );
 			<li><a href="<?php echo esc_url(get_permalink($dashboard_page)); ?>"><i class="sl sl-icon-settings"></i> <?php esc_html_e('Dashboard','listeo_core');?></a></li>
 			<?php endif; ?>
 		<?php endif; ?>
-		<?php if(in_array($role,array('administrator','admin','owner'))) : ?>
-			<?php $listings_page = get_option('listeo_listings_page');  if( $listings_page ) : ?>
-			<li><a href="<?php echo esc_url(get_permalink($listings_page)); ?>"><i class="sl sl-icon-layers"></i> <?php esc_html_e('My Listings','listeo_core');?></a></li>
-			<?php endif; ?>
-		<?php endif; ?>
 			<?php if(!in_array($role,array('owner'))) : ?>
 				<?php  $reviews_page = get_option('listeo_reviews_page');  if( $reviews_page ) : ?>
 				<li><a href="<?php echo esc_url(get_permalink($reviews_page)); ?>"><i class="sl sl-icon-star"></i> <?php esc_html_e('Reviews','listeo_core');?></a></li>
@@ -59,11 +54,11 @@ $my_account_display = get_option('listeo_my_account_display', true );
 			<?php endif; ?>
 		<?php endif; ?>
 
-		
+		<?php if(!in_array($role,array('owner'))) : ?>
 			<?php $profile_page = get_option('listeo_profile_page');  if( $profile_page ) : ?>
 			<li><a href="<?php echo esc_url(get_permalink($profile_page)); ?>"><i class="sl sl-icon-user"></i> <?php esc_html_e('My Profile','listeo_core');?></a></li>
 			<?php endif; ?>
-		
+		<?php endif; ?>
 
 			<li>
 				<a href="<?php echo wp_logout_url(get_permalink()); ?>"><i class="sl sl-icon-power"></i> <?php esc_html_e('Logout','listeo_core');?></a>
@@ -76,10 +71,10 @@ $my_account_display = get_option('listeo_my_account_display', true );
 		$submit_page = get_option('listeo_submit_page');  
 		if(function_exists('Listeo_Core')):
 		if( $popup_login == 'ajax' && !is_page_template('template-dashboard.php') ) { ?>
-			<a href="#sign-in-dialog" class="sign-in popup-with-zoom-anim"><i class="sl sl-icon-login"></i> <?php esc_html_e('Sign In', 'listeo_core'); ?></a>
+			<a href="#sign-in-dialog" class="sign-in popup-with-zoom-anim"><!--<i class="sl sl-icon-login"></i>--> <?php esc_html_e('Sign In', 'listeo_core'); ?></a>
 		<?php } else {
 			$login_page = get_option('listeo_profile_page') ?>
-			<a href="<?php echo esc_url(get_permalink($login_page)); ?>" class="sign-in"><i class="sl sl-icon-login"></i> <?php esc_html_e('Sign In', 'listeo_core'); ?></a>
+			<a href="<?php echo esc_url(get_permalink($login_page)); ?>" class="sign-in"><!--<i class="sl sl-icon-login"></i>--> <?php esc_html_e('Sign In', 'listeo_core'); ?></a>
 		<?php }
 		endif; ?>
 	<?php } ?>

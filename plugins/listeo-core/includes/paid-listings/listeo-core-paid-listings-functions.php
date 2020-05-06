@@ -1,5 +1,7 @@
 <?php
 
+
+
 /**
  * Give a user a package
  *
@@ -143,10 +145,8 @@ function listeo_core_user_packages( $user_id ) {
  * @return listeo_core__Package
  */
 function listeo_core_get_package( $package ) {
-	return new Listeo_Core_Paid_Listings_Package( $package );
+	return new Listeo_Core_Paid_Properties_Package( $package );
 }
-
-
 
 
 /**

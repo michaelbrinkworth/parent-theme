@@ -3,8 +3,16 @@ $ids = '';
 if(isset($data)) :
 	$ids	 	= (isset($data->ids)) ? $data->ids : '' ;
 endif;
-$messages = new Listeo_Core_Messages();
 
+/*if($_SERVER['REMOTE_ADDR'] == "123.201.19.159")
+{
+	echo "<pre>";
+		print_r($data);
+	echo "<pre>"; 
+	exit;
+}*/
+
+$messages = new Listeo_Core_Messages();
 ?>
 <div class="messages-container margin-top-0">
 	<div class="messages-headline">
@@ -23,38 +31,89 @@ $messages = new Listeo_Core_Messages();
 				$conversation_data = $messages->get_conversation($conversation->id);
 				$referral = $messages->get_conversation_referral($conversation->referral);
 				$if_read  = $messages->check_if_read($conversation_data);	
-				?>
-				<li <?php if(!$if_read) : ?> class="unread" <?php endif; ?>>
-					<a href="<?php echo esc_url($message_url) ?>">
-						<?php
+				/*echo "<pre>";
+					print_r($last_msg);
+				die;*/
+				if($last_msg[0]->is_offer_message == 0)
+				{
+					?>
+						<li <?php if(!$if_read) : ?> class="unread" <?php endif; ?>>
+							<a href="<?php echo esc_url($message_url) ?>">
+								<?php
+									if($last_msg) {
+										//set adversary
+										$adversary = ($conversation_data[0]->user_1 == get_current_user_id()) ? $conversation_data[0]->user_2 : $conversation_data[0]->user_1 ;
+										
+										$user_data = get_userdata( $adversary ); ?>
+										<div class="message-avatar"><?php echo get_avatar($adversary, '70') ?></div>
 					
-						if($last_msg) {
-							//set adversary
-							$adversary = ($conversation_data[0]->user_1 == get_current_user_id()) ? $conversation_data[0]->user_2 : $conversation_data[0]->user_1 ;
-							
-							$user_data = get_userdata( $adversary ); ?>
-							<div class="message-avatar"><?php echo get_avatar($adversary, '70') ?></div>
-		
-							<div class="message-by">
-								<div class="message-by-headline">
-									<?php
-									if(empty($user_data->first_name) && empty($user_data->last_name)) {
-										$name = $user_data->user_nicename;
-									} else {
-										$name = $user_data->first_name .' '.$user_data->last_name;
-									} ?>
-									<h5><?php echo esc_html($name); ?> <?php if($referral) : ?> <span class="mes_referral" style="float:none;"> <?php echo esc_html($referral);  ?></span><?php endif; ?>
-										<?php if(!$if_read) : ?><i><?php esc_html_e('Unread','listeo_core') ?></i><?php endif; ?>
-									</h5>
-									<span><?php echo human_time_diff( $last_msg[0]->created_at, current_time('timestamp')  );  ?></span>
-								</div>
-								<p><?php 
-										echo ( $last_msg[0]->sender_id == get_current_user_id() ) ? '<i class="fa fa-mail-forward" ></i>' : '<i class="fa fa-mail-reply"></i>';
-										?> <?php echo $last_msg[0]->message; ?></p>
-							</div>
-						<?php } ?>
-					</a>
-				</li>
+										<div class="message-by">
+											<div class="message-by-headline">
+												<?php
+												if(empty($user_data->first_name) && empty($user_data->last_name)) {
+													$name = $user_data->user_nicename;
+												} else {
+													$name = $user_data->first_name .' '.$user_data->last_name;
+												} ?>
+												<h5>
+													<?php echo esc_html($name); ?> <?php if($referral) : ?> 
+													<span class="mes_referral" style="float:none;"> <?php echo esc_html($referral);  ?></span><?php endif; ?>
+													<?php if(!$if_read) : ?><i><?php esc_html_e('Unread','listeo_core') ?></i><?php endif; ?>
+												</h5>
+												<span><?php echo human_time_diff( $last_msg[0]->created_at, current_time('timestamp')  );  ?></span>
+											</div>
+											<p>
+												<?php 
+													echo ( $last_msg[0]->sender_id == get_current_user_id() ) ? '<i class="fa fa-mail-forward" ></i>' : '<i class="fa fa-mail-reply"></i>';
+													?> <?php echo $last_msg[0]->message; ?>
+													
+											</p>
+										</div>
+								<?php } ?>
+							</a>
+						</li>		
+					<?php
+				}
+				else if($last_msg[0]->is_offer_message == 1) {
+					?>
+						<li <?php if(!$if_read) : ?> class="unread" <?php endif; ?>>
+							<a href="<?php echo esc_url($message_url) ?>">
+								<?php
+									if($last_msg) {
+										//set adversary
+										$adversary = ($conversation_data[0]->user_1 == get_current_user_id()) ? $conversation_data[0]->user_2 : $conversation_data[0]->user_1 ;
+										
+										$user_data = get_userdata( $adversary ); ?>
+										<div class="message-avatar"><?php echo get_avatar($adversary, '70') ?></div>
+					
+										<div class="message-by">
+											<div class="message-by-headline">
+												<?php
+												if(empty($user_data->first_name) && empty($user_data->last_name)) {
+													$name = $user_data->user_nicename;
+												} else {
+													$name = $user_data->first_name .' '.$user_data->last_name;
+												} ?>
+												<h5>
+													<?php echo esc_html($name); ?> <?php if($referral) : ?> 
+													<span class="mes_referral" style="float:none;"> <?php echo esc_html($referral);  ?></span><?php endif; ?>
+													<?php if(!$if_read) : ?><i><?php esc_html_e('Unread','listeo_core') ?></i><?php endif; ?>
+												</h5>
+												<span><?php echo human_time_diff( $last_msg[0]->created_at, current_time('timestamp')  );  ?></span>
+											</div>
+											<p>
+												<?php 
+													echo ( $last_msg[0]->sender_id == get_current_user_id() ) ? '<i class="fa fa-mail-forward" ></i>' : '<i class="fa fa-mail-reply"></i>';
+													?> <?php esc_html_e('Custom Offer','listeo_core') ?>
+													
+											</p>
+										</div>
+								<?php } ?>
+							</a>
+						</li>			
+					<?php
+				}
+				?>
 			<?php }
 			} else { ?>
 				<li><p style="padding:30px;"><?php esc_html_e("You don't have any messages yet",'listeo_core'); ?></p></li>

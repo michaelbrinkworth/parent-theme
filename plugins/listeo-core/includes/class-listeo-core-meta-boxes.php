@@ -21,7 +21,6 @@ class Listeo_Core_Meta_Boxes {
 		
 		add_action( 'cmb2_render_datetime', array( $this,'cmb2_render_callback_for_datetime'), 10, 5 );
 		
-		add_filter( 'cmb2_render_opening_hours_listeo', array( $this,'cmb2_render_opening_hours_listeo_field_callback'), 10, 5 );
 
 		add_action( 'listing_category_add_form_fields', array( $this,'listeo_listing_category_add_new_meta_field'), 10, 2 );
 		add_action( 'listing_category_edit_form_fields', array( $this,'listeo_listing_category_edit_meta_field'), 10, 2 );
@@ -131,8 +130,8 @@ class Listeo_Core_Meta_Boxes {
 			'tabs'   => array()
 		);
 		
-		$tabs_setting['tabs'] = array(
-			 
+					$tabs_setting['tabs'] = array(
+ 
 			 // $this->meta_boxes_main_details(),
 			  $this->meta_boxes_location(),
 			  $this->meta_boxes_gallery(),
@@ -142,6 +141,7 @@ class Listeo_Core_Meta_Boxes {
 			  $this->meta_boxes_rental(),
 			  $this->meta_boxes_prices(),
 			  $this->meta_boxes_video(),
+			  $this->meta_boxes_cancellation_policy(),
 			  $this->meta_boxes_custom(),
 			 // $this->meta_boxes_details(),
 			 
@@ -219,25 +219,12 @@ class Listeo_Core_Meta_Boxes {
 		$cmb_opening = new_cmb2_box( $opening_hours_options );
 
 		$cmb_opening->add_field( array(
-			'name' => 'Time zone',
-			'id'   => '_listing_timezone',
-			'type' => 'select_timezone',
-		) );
-		$cmb_opening->add_field( array(
 			'name' => __( 'Opening Hours Status', 'listeo_core' ),
 			'id'   => '_opening_hours_status',
 			'type' => 'checkbox',
 			'desc' => 'Enable to show Opening Hours widget online',
 		));
 		
-
-
-		$cmb_opening->add_field( array(
-			'name' => __( 'Opening Hours', 'listeo_core' ),
-			'id'   => '_opening_hours',
-			'type' => 'opening_hours',
-			'desc' => 'Set Opening Hours',
-		));
 		$days = listeo_get_days();
 		foreach ($days as $key => $value) {
 			
@@ -245,14 +232,14 @@ class Listeo_Core_Meta_Boxes {
 					'name' => $value . __( ' Opening', 'listeo_core' ),
 					'desc' => '',
 					'id'   => '_'.$key.'_opening_hour',
-					'type' => 'opening_hours_listeo',
+					'type' => 'text_time',
 					'attributes' => array(
 						'data-timepicker' => json_encode( array(
 							'timeFormat' => 'HH:mm',
 						) ),
 					),
 					'time_format' => 'H:i',
-					'after_field'  => '</div><button class="button button-secondary button-large add-time-picker">'.esc_html__('Add time','listeo_core').'</button><div>',
+					'after_field'  => '<button class="button button-secondary button-large clear-time-picker">'.esc_html__('Clear time','listeo_core').'</button>',
 					'before_row'      => '<div class="opening_hours_column">',
 				
 				) );
@@ -260,14 +247,14 @@ class Listeo_Core_Meta_Boxes {
 					'name' => $value . __( ' Closing', 'listeo_core' ),
 					'desc' => '',
 					'id'   => '_'.$key.'_closing_hour',
-					'type' => 'opening_hours_listeo',
+					'type' => 'text_time',
 					'attributes' => array(
 						'data-timepicker' => json_encode( array(
 							'timeFormat' => 'HH:mm',
 						) ),
 					),
 					'time_format' => 'H:i',
-					
+					'after_field'  => '<button class="button button-secondary button-large clear-time-picker">'.esc_html__('Clear time','listeo_core').'</button>',
 					'after_row'      => '</div>',
 				) );
 			
@@ -547,7 +534,7 @@ class Listeo_Core_Meta_Boxes {
 				    'query_args' => array( 'type' => 'image' ), // Only images attachment
 					// Optional, override default text strings
 					'text' => array(
-						'add_upload_files_text' => __('Add or Upload Images', 'listeo_core' ),
+						'add_upload_files_text' => 'Add or Upload Images', // default: ""
 					),
 				)
 			)
@@ -681,6 +668,27 @@ class Listeo_Core_Meta_Boxes {
 		return $fields;
 	}
 
+	public static function meta_boxes_cancellation_policy() {
+		
+		$fields = array(
+			'id'     => 'cancellation_policy_tab',
+			'title'  => __( 'Cancellation Policy', 'listeo_core' ),
+			'fields' => array(
+				array(
+					'name' => __( 'Cancellation Policy', 'listeo_core' ),
+					'id'   => '_cancellation_policy',
+					'type' => 'textarea',
+					'desc'      => __( 'Add Cancellation Policy Content','listeo_core' ),
+				),
+			
+			)
+		);
+		$fields = apply_filters( 'listeo_cancellation_policy_fields', $fields );
+		
+		// Set meta box
+		return $fields;
+	}
+
 	public static function meta_boxes_custom() {
 		
 		$fields = array(
@@ -702,35 +710,6 @@ class Listeo_Core_Meta_Boxes {
 		return $fields;
 	}
 
-		
-	function cmb2_render_opening_hours_listeo_field_callback( $field, $escaped_value, $object_id, $object_type, $field_type_object ) {
-		//var_dump($escaped_value);
-		if(is_array($escaped_value)){
-			foreach ($escaped_value as $key => $time) {
-				echo $field_type_object->input( 
-					array( 
-						'type' => 'text_time', 
-						
-						'value' => $time,
-						'name'  => $field_type_object->_name( '[]' ),
-						
-					
-						'time_format' => 'H:i',
-					) );
-					echo "<br>";	
-			}
-		} else {
-			echo $field_type_object->input( 
-				array( 
-					'type' => 'text', 
-					'class' => 'input', 
-					'name'  => $field_type_object->_name( '[]' ),
-
-				) );	
-		}
-		
-	}
-			
 
 	
 	/**
@@ -744,8 +723,6 @@ class Listeo_Core_Meta_Boxes {
 			'description' => '',
 			'price'      => '',
 			'bookable'      => '',
-			'bookable_options'      => '',
-			'bookable_quantity'      => '',
 		) );
 
 		?>
@@ -760,7 +737,7 @@ class Listeo_Core_Meta_Boxes {
 		</div>
 
 		
-		<div class="alignleft"><p><label for="<?php echo $field_type->_id( '_price' ); ?>'"><?php echo esc_html( $field_type->_text( 'listeomenu_price_text', __('Price','listeo_core') ) ); ?></label></p>
+		<div class="alignleft"><p><label for="<?php echo $field_type->_id( '_price' ); ?>'"><?php echo esc_html( $field_type->_text( 'listeomenu_price_text', 'Price' ) ); ?></label></p>
 			<?php echo $field_type->input( array(
 				'class' => '',
 				'name'  => $field_type->_name( '[price]' ),
@@ -770,7 +747,7 @@ class Listeo_Core_Meta_Boxes {
 				'desc'  => '',
 			) ); ?>
 		</div>
-		<div class="alignleft"><p><label for="<?php echo $field_type->_id( '_bookable' ); ?>'"><?php echo esc_html( $field_type->_text( 'listeomenu_bookable_text', __('Bookable','listeo_core') ) ); ?></label></p>
+		<div class="alignleft"><p><label for="<?php echo $field_type->_id( '_bookable' ); ?>'"><?php echo esc_html( $field_type->_text( 'listeomenu_bookable_text', 'Bookable' ) ); ?></label></p>
 			<?php echo $field_type->input( array(
 				'class' => '',
 				'name'  => $field_type->_name( '[bookable]' ),
@@ -782,33 +759,8 @@ class Listeo_Core_Meta_Boxes {
 				'desc'  => '',
 			) ); ?>
 		</div>
-			<div class="alignleft"><p><label for="<?php echo $field_type->_id( '_bookable_options' ); ?>'"><?php echo esc_html( $field_type->_text( 'listeomenu_bookable_options_text', 'Bookable Options' ) ); ?></label></p>
-			<?php echo $field_type->select( array(
-				'name'  => $field_type->_name( '[bookable_options]' ),
-				'id'    => $field_type->_id( '_bookable_options' ),
-				'value' => $value['bookable_options'],
-				'desc'  => '',
-				'options'          => '<option '.selected('onetime',$value['bookable_options'],false).' value="onetime">'.esc_html__('One time fee','listeo_core').'</option>
-							<option '.selected('byguest',$value['bookable_options'],false).' value="byguest">'.esc_html__('Multiply by guests','listeo_core').'</option>
-							<option '.selected('bydays',$value['bookable_options'],false).' value="bydays">'.esc_html__('Multiply by days','listeo_core').'</option>
-							<option '.selected('byguestanddays',$value['bookable_options'],false).' value="byguestanddays">'.esc_html__('Multiply by guests & days ','listeo_core').'</option>'
-				
-			) ); ?>
-		</div>
-		<div class="alignleft"><p><label for="<?php echo $field_type->_id( '_bookable_quantity' ); ?>'"><?php echo esc_html( $field_type->_text( 'listeomenu_bookable_quantity_text', 'Bookable Quantity' ) ); ?></label></p>
-			<?php echo $field_type->input( array(
-				'class' => '',
-				'name'  => $field_type->_name( '[bookable_quantity]' ),
-				'id'    => $field_type->_id( '_bookable_quantity' ),
-				'value' => 'on',
-				'type'  => 'checkbox',
-				'checked'  => ($value['bookable_quantity'] == 'on') ? 'checked' : false,
-
-				'desc'  => '',
-			) ); ?>
-		</div>
 		<br class="clear">
-		<div><p><label for="<?php echo $field_type->_id( '_description' ); ?>'"><?php echo esc_html( $field_type->_text( 'listeomenu_description_text', __('Description','listeo_core') ) ); ?></label></p>
+		<div><p><label for="<?php echo $field_type->_id( '_description' ); ?>'"><?php echo esc_html( $field_type->_text( 'listeomenu_description_text', 'Description' ) ); ?></label></p>
 			<?php echo $field_type->textarea( array(
 				'name'  => $field_type->_name( '[description]' ),
 				'id'    => $field_type->_id( '_description' ),
@@ -816,11 +768,6 @@ class Listeo_Core_Meta_Boxes {
 				'desc'  => '',
 			) ); ?>
 		</div>
-		<!-- bookable_options
-			bookable_quantity -->
-
-			
-	
 		<?php
 		echo $field_type->_desc( true );
 
@@ -1067,8 +1014,6 @@ class Listeo_Core_Meta_Boxes {
 	function cmb2_render_callback_for_datetime( $field, $escaped_value, $object_id, $object_type, $field_type_object ) {
 		echo $field_type_object->input( array( 'type' => 'text', 'class' => 'input-datetime' ) );
 	}
-
-	
 
 
 
