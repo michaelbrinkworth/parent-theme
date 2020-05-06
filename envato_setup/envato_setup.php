@@ -628,7 +628,7 @@ if ( ! class_exists( 'Envato_Theme_Setup_Wizard' ) ) {
 					<h1>Houston, we have a problem! 🚀 ✋ 👇</h1>
 					<p>It looks like <strong>your server runs on PHP version older than 5.6</strong> which is not compatible with our theme and plugins. If you are not able to update it on your own, please contact your hosting provider and ask them for an update. We recommend using PHP7 for best results.</p>
 					<p>Your current PHP Version is <?php echo phpversion(); ?></p>
-					<p>If you wish you can run the Setup Wizard but that will not work correctly and you won't be able to use most of the features, including the core Realto plugin, so please come back here when your PHP is updated.</p>
+					<p>If you wish you can run the Setup Wizard but that will not work correctly and you won't be able to use most of the features, including the core plugin, so please come back here when your PHP is updated.</p>
 				<?php }
 			if ( false && isset( $_REQUEST['debug'] ) ) {
 				echo '<pre>';
@@ -2370,6 +2370,10 @@ if ( ! class_exists( 'Envato_Theme_Setup_Wizard' ) ) {
 			$listeo_claim_page = get_page_by_title( 'Claim Listing' );
 			if ( $listeo_claim_page ) {
 				update_option( 'listeo_claim_page', $listeo_claim_page->ID );
+			}
+			$listeo_ical_page = get_page_by_title( 'iCal' );
+			if ( $listeo_ical_page ) {
+				update_option( 'listeo_ical_page', $listeo_ical_page->ID );
 			}
 			
 

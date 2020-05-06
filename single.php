@@ -12,16 +12,19 @@ get_header();
 $layout = get_post_meta($post->ID, 'listeo_page_layout', true); if(empty($layout)) { $layout = 'right-sidebar'; }
 $class  = ($layout !="full-width") ? "col-md-9 col-sm-7 extra-gutter-right" : "col-md-12"; ?>
 
+<?php $titlebar_status = get_option('listeo_blog_titlebar_status','show');
+
+if( $titlebar_status == 'show' ) : ?>
 <!-- Titlebar
 ================================================== -->
-<div id="titlebar" class="gradient">
+<div id="titlebar" class="<?php echo esc_attr(get_option('listeo_blog_titlebar_style','gradient')); ?>">
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
-
+				
 				<h2><?php echo get_option('listeo_blog_title','Blog'); ?></h2>
 				<span><?php echo get_option('listeo_blog_subtitle','Latest News'); ?></span>
-				
+	
 				<!-- Breadcrumbs -->
 				<?php if(function_exists('bcn_display')) { ?>
                     <nav id="breadcrumbs">
@@ -35,10 +38,14 @@ $class  = ($layout !="full-width") ? "col-md-9 col-sm-7 extra-gutter-right" : "c
 		</div>
 	</div>
 </div>
+<?php 
+endif; 
+$sidebar_side = get_option('pp_blog_layout'); 
 
+?>
 <!-- Content
 ================================================== -->
-<div class="container">
+<div class="container <?php echo esc_attr($sidebar_side); if( $titlebar_status == 'hide' ) { echo ' margin-top-50'; } ?>">
 
 	<!-- Blog Posts -->
 	<div class="blog-page">

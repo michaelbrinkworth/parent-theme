@@ -82,7 +82,7 @@ if($product->get_type() == "listing_package" ) { ?>
         </div>
 
 		<div class="plan-features">
-                <ul>
+                <ul class="plan-features-auto-wc">
                     <?php 
                     $propertieslimit = $product->get_limit();
                     if(!$propertieslimit){

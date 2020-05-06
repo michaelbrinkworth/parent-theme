@@ -43,18 +43,15 @@
 		                $logo_retina = get_option( 'pp_retina_logo_upload', '' ); 
 		                $logo_dashboard = get_option( 'pp_dashboard_logo_upload', '' ); 
 		             	if($logo) { ?>
-		                    <a href="<?php echo esc_url( 'www.hypley.com.au' ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
-		                    	<img src="<?php echo esc_url($logo); ?>" data-rjs="<?php echo esc_url($logo_retina); ?>" 
-		                    	alt="<?php esc_attr(bloginfo('name')); ?>"/>
-		                    </a>
-		                    <a href="<?php echo esc_url( 'www.hypley.com.au' ); ?>" class="dashboard-logo" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
-		                    	<img src="<?php echo esc_url($logo_dashboard); ?>" data-rjs="<?php echo esc_url($logo_dashboard); ?>" 
-		                    	alt="<?php esc_attr(bloginfo('name')); ?>"/>
-		                    </a>
+		                    
+		                    <a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo esc_url($logo); ?>" data-rjs="<?php echo esc_url($logo_retina); ?>" 
+		                    	alt="<?php esc_attr(bloginfo('name')); ?>"/></a>
+		                    <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="dashboard-logo" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><img src="<?php echo esc_url($logo_dashboard); ?>" data-rjs="<?php echo esc_url($logo_dashboard); ?>" 
+		                    	alt="<?php esc_attr(bloginfo('name')); ?>"/></a>
 		                    <?php 
 		                } else { ?>
 							<h1>
-								<a href="<?php echo esc_url( 'www.hypley.com.au' ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a>
+								<a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a>
 							</h1>
 		                    <?php 
 		                }
@@ -98,76 +95,23 @@
 			}
 			$my_account_display = get_option('listeo_my_account_display', true );
 			$submit_display = get_option('listeo_submit_display', true );
-			?> 
+			
+			if($my_account_display != false || $submit_display != false ) :	?> 
 			<!-- Right Side Content / End -->
 
 			<div class="right-side">
 				<div class="header-widget">
-					<div class="user-menu">
-						<div class="user-name"><span><?php echo get_avatar( $current_user->user_email, 32 );?></span>
-							<?php esc_html_e('Hi,','listeo') ?> <?php echo esc_html($name); ?>!</div>
-						<ul>
-							<?php if(!in_array($role,array('owner'))) : ?>
-								<?php $user_bookings_page = get_option('listeo_user_bookings_page');  if( $user_bookings_page ) : ?>
-								<li <?php if( $post->ID == $user_bookings_page ) : ?>class="active" <?php endif; ?>><a href="<?php echo esc_url(get_permalink($user_bookings_page)); ?>"><i class="fa fa-calendar-check-o"></i> <?php esc_html_e('My Bookings','listeo');?></a></li>
-								<?php endif; ?>
-							<?php endif; ?>
-							<?php if(in_array($role,array('administrator','admin','owner'))) : ?>
-								<?php $dashboard_page = get_option('listeo_dashboard_page');  if( $dashboard_page ) : ?>
-								<li><a href="<?php echo esc_url(get_permalink($dashboard_page)); ?>"><i class="sl sl-icon-settings"></i> <?php esc_html_e('Dashboard','listeo');?></a></li>
-								<?php endif; ?>
-							<?php endif; ?>
-								<?php if(!in_array($role,array('owner'))) : ?>
-									<?php  $reviews_page = get_option('listeo_reviews_page');  if( $reviews_page ) : ?>
-									<li <?php if( $post->ID == $reviews_page ) : ?>class="active" <?php endif; ?>><a href="<?php echo esc_url(get_permalink($reviews_page)); ?>"><i class="sl sl-icon-star"></i> <?php esc_html_e('Reviews','listeo');?></a></li>
-									<?php endif; ?>
-								<?php endif; ?>
-
-								<?php if(!in_array($role,array('owner'))) : ?>
-									<?php $bookmarks_page = get_option('listeo_bookmarks_page');  if( $bookmarks_page ) : ?>
-									<li <?php if( $post->ID == $bookmarks_page ) : ?>class="active" <?php endif; ?>><a href="<?php echo esc_url(get_permalink($bookmarks_page)); ?>"><i class="sl sl-icon-heart"></i> <?php esc_html_e('Bookmarks','listeo');?></a></li>
-									<?php endif; ?>
-								<?php endif; ?>
-								
-								<?php $messages_page = get_option('listeo_messages_page');  if( $messages_page ) : ?>
-								<li <?php if( $post->ID == $messages_page ) : ?>class="active" <?php endif; ?>><a href="<?php echo esc_url(get_permalink($messages_page)); ?>"><i class="sl sl-icon-envelope-open"></i> <?php esc_html_e('Messages','listeo');?>
-								<?php 
-									$counter = listeo_get_unread_counter();
-									if($counter) { ?>
-									<span class="nav-tag messages"><?php echo esc_html($counter); ?></span>
-									<?php } ?>
-								</a></li>
-								<?php endif; ?>
-								
-							<?php if(in_array($role,array('administrator','admin','owner'))) : ?>
-								<?php $bookings_page = get_option('listeo_bookings_page');  if( $bookings_page ) : ?>
-								<li <?php if( $post->ID == $bookings_page ) : ?>class="active" <?php endif; ?>><a href="<?php echo esc_url(get_permalink($bookings_page)); ?>/?status=waiting"><i class="fa fa-calendar-check-o"></i> <?php esc_html_e('Bookings','listeo');?></a></li>
-								<?php endif; ?>
-							<?php endif; ?>
-
-							<?php if(!in_array($role,array('owner'))) : ?>
-								<?php $profile_page = get_option('listeo_profile_page');  if( $profile_page ) : ?>
-								<li <?php if( $post->ID == $profile_page ) : ?>class="active" <?php endif; ?>><a href="<?php echo esc_url(get_permalink($profile_page)); ?>"><i class="sl sl-icon-user"></i> <?php esc_html_e('My Profile','listeo');?></a></li>
-								<?php endif; ?>
-							<?php endif; ?>
-
-								<li><a href="<?php echo wp_logout_url(home_url()); ?>"><i class="sl sl-icon-power"></i> <?php esc_html_e('Logout','listeo');?></a></li>
-							</ul>
-					</div>
-					<?php if( true == $submit_display) : ?>
-						<?php if(in_array($role,array('administrator','admin','owner'))) : ?>
-							<?php $submit_page = get_option('listeo_submit_page');  if( $submit_page ) : ?>
-								<a href="<?php echo esc_url(get_permalink($submit_page)); ?>" class="button border with-icon"><?php esc_html_e('Add Listing', 'listeo'); ?> <i class="sl sl-icon-plus"></i></a>
-							<?php endif; ?>
-						<?php else: ?>
-							<?php $browse_page = get_post_type_archive_link( 'listing' ); ;  if( $browse_page ) : ?>
-								<a href="<?php echo esc_url($browse_page); ?>" class="button border"><?php esc_html_e('Browse Listings', 'listeo'); ?></i></a>
-							<?php endif; ?>
-						<?php endif; ?>
-					<?php endif; ?>
+					<?php 
+					if(class_exists('Listeo_Core_Template_Loader')):
+						$template_loader = new Listeo_Core_Template_Loader;		
+						$template_loader->get_template_part( 'account/logged_section' ); 
+					endif;
+					?>
 				</div>
 			</div>
+
 			<!-- Right Side Content / End -->
+			<?php endif; ?>
 			
 		</div>
 	</div>

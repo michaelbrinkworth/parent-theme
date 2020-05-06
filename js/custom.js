@@ -2,8 +2,6 @@
 (function ($) {
 "use strict";
 
-
-
 function starsOutput(firstStar, secondStar, thirdStar, fourthStar, fifthStar) {
 		return(''+
 			'<span class="'+firstStar+'"></span>'+
@@ -448,7 +446,7 @@ $(document).ready(function(){
 
     for (var selector in config) {
 	   	if (config.hasOwnProperty(selector)) {
-	      jQuery(selector).chosen(config[selector]);
+	      $(selector).chosen(config[selector]);
 	  	}
     }
 
@@ -729,17 +727,6 @@ $(document).ready(function(){
 		    }
 	  ]
 	});
-
-	
-	$('.listeo_cat_page_silder').slick({
-	  dots: true,
-	  infinite: true,
-	  speed: 300,
-	  slidesToShow: 1,
-	  arrows: true,
-	  adaptiveHeight: true
-	});
-
 
 	// Fix for carousel if there are less than 4 categories
     $(window).on('load resize', function(e) {
@@ -1422,13 +1409,6 @@ $(document).ready(function(){
 		$("#map-container").addClass("hide-map-on-mobile");
 	});
 	
-	/*$('.listeo_liting_single_galary_image').on('click',function(){
-		console.log('click');
-		//console.log($(this).data('url'));	
-	});*/
-	
-	
-	
 
 
 /*----------------------------------------------------*/
@@ -1441,14 +1421,6 @@ $('.numerical-rating').numericalRating();
 
 $('.star-rating').starRating();
 // ------------------ End Document ------------------ //
-});
-
-/*$('.listing-item').find('.listeo_liting_single_galary_image').click(function(){
-    console.log('click seconnn');
-});*/
-
-$('.listeo_liting_single_galary_image').on('click',function(){
-    console.log('click seconnn');
 });
 
 })(this.jQuery);

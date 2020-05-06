@@ -84,14 +84,16 @@
 			</div>
 			<!-- Left Side Content / End -->
 			<?php 
+			
 			$my_account_display = get_option('listeo_my_account_display', true );
 			$submit_display = get_option('listeo_submit_display', true );
+			
 			if($my_account_display != false || $submit_display != false ) :	?> 
 			<!-- Right Side Content / End -->
 
 			<div class="right-side">
 				<div class="header-widget">
-					<?php if( true == $my_account_display) : ?>
+				<?php if( true == $my_account_display) : ?>
 					
 						<?php if ( is_user_logged_in() ) { 
 								$current_user = wp_get_current_user();
@@ -190,8 +192,16 @@
 						<?php } ?>
 						
 					<?php endif; ?>
+
+					<?php 
+					if(class_exists('Listeo_Core_Template_Loader')):
+						$template_loader = new Listeo_Core_Template_Loader;		
+						$template_loader->get_template_part( 'account/logged_section' ); 
+					endif;
+					?>
 				</div>
 			</div>
+			
 			<!-- Right Side Content / End -->
 			<?php endif; ?>
 			

@@ -325,6 +325,7 @@ $role = array_shift( $roles );
 				<li <?php if( $post->ID == $profile_page ) : ?>class="active" <?php endif; ?>><a href="<?php echo esc_url(get_permalink($profile_page)); ?>"><i class="sl sl-icon-user"></i> <?php esc_html_e('My Profile','listeo');?></a></li>
 				<?php endif; ?>
 
+		<?php if(in_array($role,array('administrator','admin','owner'))) : ?>
 				<?php 
 
 				$orders_page_status = get_option('listeo_orders_page');
@@ -346,7 +347,7 @@ $role = array_shift( $roles );
 					<li <?php if( $post->ID == $subscription_page ) : ?>class="active" <?php endif; ?>><a href="<?php echo esc_url($subscription_page); ?>"><i class="sl sl-icon-refresh"></i> <?php esc_html_e('My Subscriptions','listeo');?></a></li>
 					<?php endif; 
 				} ?>
-
+		<?php endif; ?>
 
 				<li><a href="<?php echo wp_logout_url(home_url()); ?>"><i class="sl sl-icon-power"></i> <?php esc_html_e('Logout','listeo');?></a></li>
 			</ul>

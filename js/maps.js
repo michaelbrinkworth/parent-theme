@@ -6,10 +6,13 @@
   $(function () {
     
     var infoBox_ratingType = 'star-rating';
-
+    var geooptions = {};  
+     if(listeo_core.country){
+      geooptions = {componentRestrictions:{country:listeo_core.country}}; 
+    } 
 
     var geocoder = new google.maps.Geocoder();  
-    $("#_address").geocomplete().bind("geocode:result", function(event, result){
+    $("#_address").geocomplete(geooptions).bind("geocode:result", function(event, result){
 
         var loc = result.geometry.location,
             lat = loc.lat(),

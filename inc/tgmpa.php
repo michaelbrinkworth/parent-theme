@@ -81,28 +81,28 @@ function listeo_register_required_plugins() {
 	        'name'                  => 'Listeo Core',
 	        'slug'                  => 'listeo-core',
 	        'source'                => get_template_directory() . '/plugins/listeo-core.zip',
-	        'version'               => '1.3.4',
+	        'version'               => '1.4.1',
 	        'required'              => true,
 	    ),	 	    
 	    array(
 	        'name'                  => 'Listeo Shortcodes',
 	        'slug'                  => 'listeo-shortcodes',
 	        'source'                => get_template_directory() . '/plugins/listeo-shortcodes.zip',
-	        'version'               => '1.4.7',
+	        'version'               => '1.5',
 	        'required'              => true,
 	    ),	    
 	    array(
 	        'name'                  => 'Listeo VC Bridge',
 	        'slug'                  => 'listeo-vc-bridge',
 	        'source'                => get_template_directory() . '/plugins/listeo-vc-bridge.zip',
-	        'version'               => '1.4.6',
+	        'version'               => '1.5',
 	        'required'              => true,
 	    ),	
 	     array(
 	        'name'                  => 'Listeo Forms and Fields Editor',
 	        'slug'                  => 'listeo-forms-and-fields-editor',
 	        'source'                => get_template_directory() . '/plugins/listeo-forms-and-fields-editor.zip',
-	        'version'               => '1.3.6',
+	        'version'               => '1.4.1',
 	        'required'              => true,
 	    ),	     
 	    array(
@@ -187,7 +187,7 @@ function listeo_register_required_plugins() {
 		'default_path' => '',                      // Default absolute path to bundled plugins.
 		'menu'         => 'tgmpa-install-plugins', // Menu slug.
 		'has_notices'  => true,                    // Show admin notices or not.
-		'dismissable'  => true,                    // If false, a user cannot dismiss the nag message.
+		'dismissable'  => false,                    // If false, a user cannot dismiss the nag message.
 		'dismiss_msg'  => '',                      // If 'dismissable' is false, this message will be output at top of nag.
 		'is_automatic' => false,                   // Automatically activate plugins after installation or not.
 		'message'      => '',                      // Message to output right before the plugins table.

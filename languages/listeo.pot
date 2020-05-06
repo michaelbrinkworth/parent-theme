@@ -2,9 +2,9 @@
 # This file is distributed under the ThemeForest.=!>
 msgid ""
 msgstr ""
-"Project-Id-Version: Listeo 1.2.9\n"
+"Project-Id-Version: Listeo 1.3.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/build\n"
-"POT-Creation-Date: 2020-01-29 16:18:47+00:00\n"
+"POT-Creation-Date: 2020-04-05 07:06:58+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -52,32 +52,32 @@ msgstr ""
 msgid "Contact"
 msgstr ""
 
-#: author.php:116
+#: author.php:123
 msgid "Please %s sign %s in to see contact details."
 msgstr ""
 
-#: author.php:132 author.php:142 author.php:149
+#: author.php:140 author.php:150 author.php:157
 msgid "Send Message"
 msgstr ""
 
-#: author.php:140
+#: author.php:148
 msgid "Your message to "
 msgstr ""
 
-#: author.php:156
+#: author.php:164
 msgid "About"
 msgstr ""
 
-#: author.php:168
+#: author.php:176
 msgid "'s Listings"
 msgstr ""
 
-#: author.php:231 header-dashboard.php:119 header-split.php:121
-#: template-dashboard.php:312 woocommerce/single-product-reviews.php:39
+#: author.php:239 template-dashboard.php:312
+#: woocommerce/single-product-reviews.php:39
 msgid "Reviews"
 msgstr ""
 
-#: author.php:246
+#: author.php:254
 msgid "on"
 msgstr ""
 
@@ -121,7 +121,7 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
-#: envato_setup/envato_setup.php:436 envato_setup/envato_setup.php:2487
+#: envato_setup/envato_setup.php:436 envato_setup/envato_setup.php:2491
 msgid "Logo"
 msgstr ""
 
@@ -225,15 +225,15 @@ msgid "You can add and remove plugins later on from within WordPress."
 msgstr ""
 
 #: envato_setup/envato_setup.php:856 envato_setup/envato_setup.php:1029
-#: envato_setup/envato_setup.php:2456 envato_setup/envato_setup.php:2527
-#: envato_setup/envato_setup.php:2611 envato_setup/envato_setup.php:2681
-#: envato_setup/envato_setup.php:2718
+#: envato_setup/envato_setup.php:2460 envato_setup/envato_setup.php:2531
+#: envato_setup/envato_setup.php:2615 envato_setup/envato_setup.php:2685
+#: envato_setup/envato_setup.php:2722
 msgid "Continue"
 msgstr ""
 
 #: envato_setup/envato_setup.php:858 envato_setup/envato_setup.php:1031
-#: envato_setup/envato_setup.php:2458 envato_setup/envato_setup.php:2529
-#: envato_setup/envato_setup.php:2627
+#: envato_setup/envato_setup.php:2462 envato_setup/envato_setup.php:2533
+#: envato_setup/envato_setup.php:2631
 msgid "Skip this step"
 msgstr ""
 
@@ -355,15 +355,15 @@ msgstr ""
 msgid "Remote file is too large, limit is %s"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2437
+#: envato_setup/envato_setup.php:2441
 msgid "Site Style"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2439
+#: envato_setup/envato_setup.php:2443
 msgid "Please choose your site style below."
 msgstr ""
 
-#: envato_setup/envato_setup.php:2489
+#: envato_setup/envato_setup.php:2493
 msgid ""
 "Please add your logo below. For best results, the logo should be a "
 "transparent PNG . The logo can be changed at any time from the Appearance > "
@@ -371,76 +371,76 @@ msgid ""
 "logo designed."
 msgstr ""
 
-#: envato_setup/envato_setup.php:2509
+#: envato_setup/envato_setup.php:2513
 msgid "Upload New Logo"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2583
+#: envato_setup/envato_setup.php:2587
 msgid "Theme Updates"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2616
+#: envato_setup/envato_setup.php:2620
 msgid ""
 "Please login using your ThemeForest account to enable Theme Updates. We "
 "update themes when a new feature is added or a bug is fixed. It is highly "
 "recommended to enable Theme Updates."
 msgstr ""
 
-#: envato_setup/envato_setup.php:2625
+#: envato_setup/envato_setup.php:2629
 msgid "Login with Envato"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2746
+#: envato_setup/envato_setup.php:2750
 msgid "Your Website is Ready!"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2761
+#: envato_setup/envato_setup.php:2765
 msgid "Next Steps"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2765
+#: envato_setup/envato_setup.php:2769
 msgid "Follow @purethemes on Twitter"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2768
+#: envato_setup/envato_setup.php:2772
 msgid "View your new website!"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2773
+#: envato_setup/envato_setup.php:2777
 msgid "More Resources"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2776
+#: envato_setup/envato_setup.php:2780
 msgid "Read the Theme Documentation"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2779
+#: envato_setup/envato_setup.php:2783
 msgid "Learn how to use WordPress"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2782
+#: envato_setup/envato_setup.php:2786
 msgid "Leave an Item Rating"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2850
+#: envato_setup/envato_setup.php:2854
 msgid "Something went wrong while trying to retrieve oauth token: %s"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2867
+#: envato_setup/envato_setup.php:2871
 msgid "Login for %s updates"
 msgstr ""
 
-#: envato_setup/envato_setup.php:2874
+#: envato_setup/envato_setup.php:2878
 msgid "oAuth Login"
 msgstr ""
 
-#: envato_setup/envato_setup.php:3032
+#: envato_setup/envato_setup.php:3036
 msgid ""
 "Please activate ThemeForest updates to ensure you have the latest version "
 "of this theme."
 msgstr ""
 
-#: envato_setup/envato_setup.php:3035
+#: envato_setup/envato_setup.php:3039
 msgid "<a class=\"button button-primary\" href=\"%s\">Activate Updates</a>"
 msgstr ""
 
@@ -468,104 +468,55 @@ msgstr ""
 msgid "Book Now"
 msgstr ""
 
-#: functions.php:57
+#: functions.php:58
 msgid "Main Menu"
 msgstr ""
 
-#: functions.php:105
+#: functions.php:106
 msgid "Sidebar"
 msgstr ""
 
-#: functions.php:107 functions.php:153
+#: functions.php:108 functions.php:154
 msgid "Add widgets here."
 msgstr ""
 
-#: functions.php:116
+#: functions.php:117
 msgid "Footer 1st Column"
 msgstr ""
 
-#: functions.php:117
+#: functions.php:118
 msgid "1st column for widgets in Footer"
 msgstr ""
 
-#: functions.php:125
+#: functions.php:126
 msgid "Footer 2nd Column"
 msgstr ""
 
-#: functions.php:126
+#: functions.php:127
 msgid "2nd column for widgets in Footer"
 msgstr ""
 
-#: functions.php:134
+#: functions.php:135
 msgid "Footer 3rd Column"
 msgstr ""
 
-#: functions.php:135
+#: functions.php:136
 msgid "3rd column for widgets in Footer"
 msgstr ""
 
-#: functions.php:143
+#: functions.php:144
 msgid "Footer 4th Column"
 msgstr ""
 
-#: functions.php:144
+#: functions.php:145
 msgid "4th column for widgets in Footer"
 msgstr ""
 
-#: functions.php:151 inc/customizer/header.php:26
+#: functions.php:152 inc/customizer/header.php:26
 msgid "Header"
 msgstr ""
 
-#: header-dashboard.php:105
-msgid "Hi,"
-msgstr ""
-
-#: header-dashboard.php:109 header-split.php:111 template-dashboard.php:207
-#: template-dashboard.php:212
-msgid "My Bookings"
-msgstr ""
-
-#: header-dashboard.php:114 header-split.php:116 template-dashboard.php:198
-#: template-dashboard.php:416
-msgid "Dashboard"
-msgstr ""
-
-#: header-dashboard.php:125 header-split.php:127 template-dashboard.php:316
-msgid "Bookmarks"
-msgstr ""
-
-#: header-dashboard.php:130 header-split.php:132 template-dashboard.php:219
-msgid "Messages"
-msgstr ""
-
-#: header-dashboard.php:141 header-split.php:143 template-dashboard.php:231
-#: template-dashboard.php:402
-msgid "Bookings"
-msgstr ""
-
-#: header-dashboard.php:147 header-split.php:149 template-dashboard.php:325
-msgid "My Profile"
-msgstr ""
-
-#: header-dashboard.php:151 header-split.php:153 template-dashboard.php:351
-msgid "Logout"
-msgstr ""
-
-#: header-dashboard.php:157 header-split.php:174 header-split.php:183
-#: template-dashboard.php:272
-msgid "Add Listing"
-msgstr ""
-
-#: header-dashboard.php:161 header-split.php:178
-msgid "Browse Listings"
-msgstr ""
-
-#: header-split.php:107
-msgid "My Account"
-msgstr ""
-
-#: header-split.php:161 header-split.php:164 header-split.php:204
-#: header.php:189
+#: header-split.php:119 header.php:189
 msgid "Sign In"
 msgstr ""
 
@@ -2083,15 +2034,15 @@ msgstr ""
 msgid "To search type and hit enter"
 msgstr ""
 
-#: single.php:61
+#: single.php:68
 msgid "Previous Post"
 msgstr ""
 
-#: single.php:62
+#: single.php:69
 msgid "Next Post"
 msgstr ""
 
-#: single.php:63
+#: single.php:70
 msgid "Post navigation"
 msgstr ""
 
@@ -2181,6 +2132,22 @@ msgstr ""
 msgid "Main"
 msgstr ""
 
+#: template-dashboard.php:198 template-dashboard.php:417
+msgid "Dashboard"
+msgstr ""
+
+#: template-dashboard.php:207 template-dashboard.php:212
+msgid "My Bookings"
+msgstr ""
+
+#: template-dashboard.php:219
+msgid "Messages"
+msgstr ""
+
+#: template-dashboard.php:231 template-dashboard.php:403
+msgid "Bookings"
+msgstr ""
+
 #: template-dashboard.php:234 template-dashboard.php:288
 msgid "Pending"
 msgstr ""
@@ -2201,6 +2168,10 @@ msgstr ""
 msgid "Listings"
 msgstr ""
 
+#: template-dashboard.php:272
+msgid "Add Listing"
+msgstr ""
+
 #: template-dashboard.php:277
 msgid "My Listings"
 msgstr ""
@@ -2209,35 +2180,47 @@ msgstr ""
 msgid "Expired"
 msgstr ""
 
+#: template-dashboard.php:316
+msgid "Bookmarks"
+msgstr ""
+
 #: template-dashboard.php:323
 msgid "Account"
 msgstr ""
 
-#: template-dashboard.php:336
+#: template-dashboard.php:325
+msgid "My Profile"
+msgstr ""
+
+#: template-dashboard.php:337
 msgid "My Orders"
 msgstr ""
 
-#: template-dashboard.php:346
+#: template-dashboard.php:347
 msgid "My Subscriptions"
 msgstr ""
 
-#: template-dashboard.php:381
+#: template-dashboard.php:352
+msgid "Logout"
+msgstr ""
+
+#: template-dashboard.php:382
 msgid "Howdy,"
 msgstr ""
 
-#: template-dashboard.php:388
+#: template-dashboard.php:389
 msgid "Approved Bookings"
 msgstr ""
 
-#: template-dashboard.php:392
+#: template-dashboard.php:393
 msgid "Pending Bookings"
 msgstr ""
 
-#: template-dashboard.php:396
+#: template-dashboard.php:397
 msgid "Cancelled Bookings"
 msgstr ""
 
-#: template-dashboard.php:415
+#: template-dashboard.php:416
 msgid "Home"
 msgstr ""
 
@@ -2267,6 +2250,10 @@ msgstr ""
 #: template-parts/content-page.php:46 template-parts/content-single.php:20
 #: template-parts/content.php:38
 msgid "Pages:"
+msgstr ""
+
+#: template-ical.php:22
+msgid " - Bookings"
 msgstr ""
 
 #: template-parts/author-content-none.php:14
@@ -2628,6 +2615,10 @@ msgstr ""
 
 #. Template Name of the plugin/theme
 msgid "Home Page with Search Form"
+msgstr ""
+
+#. Template Name of the plugin/theme
+msgid "Listeo iCal Output"
 msgstr ""
 
 #. Template Name of the plugin/theme

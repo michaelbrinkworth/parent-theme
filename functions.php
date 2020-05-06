@@ -25,6 +25,7 @@ $ownerusers = get_users( 'role=owner' );
 foreach ( $ownerusers as $user ) {
    $user->add_cap('level_1');
 }
+
 function listeo_setup() {
 
 
@@ -187,11 +188,7 @@ function listeo_scripts() {
 	wp_register_style( 'bootstrap', get_template_directory_uri(). '/css/bootstrap-grid.css' );
 	wp_register_style( 'listeo-woocommerce', get_template_directory_uri(). '/css/woocommerce.min.css' );
     wp_register_style( 'listeo-icons', get_template_directory_uri(). '/css/icons.css' );
-	wp_register_style( 'listeo-slick', get_template_directory_uri(). '/css/slick.css' );
-	wp_register_style( 'listeo-slick-theme', get_template_directory_uri(). '/css/slick-theme.css' );
 	wp_enqueue_style( 'listeo-style', get_stylesheet_uri(), array('bootstrap','listeo-icons','listeo-woocommerce'), $ver_num );
-	/*wp_enqueue_style( 'listeo-slick' );
-	wp_enqueue_style( 'listeo-slick-theme' );*/
 	
 	wp_register_script( 'chosen-min', get_template_directory_uri() . '/js/chosen.min.js', array( 'jquery' ), $ver_num );
 	wp_register_script( 'counterup-min', get_template_directory_uri() . '/js/counterup.min.js', array( 'jquery' ), $ver_num );
@@ -382,3 +379,20 @@ function listeo_new_customer_data($new_customer_data){
 }
 add_filter( 'woocommerce_new_customer_data', 'listeo_new_customer_data');
 
+
+function listeo_noindex_for_products()
+{
+    if ( is_singular( 'product' ) ) {
+    	global $post;
+    	if( function_exists('wc_get_product') ){
+    		$product = wc_get_product( $post->ID );
+    		//listing_booking, listing_package_subscription, listing_package
+            if( $product->is_type( 'listing_booking' ) || $product->is_type( 'listing_package_subscription' ) || $product->is_type( 'listing_package' )  ){
+            	echo '<meta name="robots" content="noindex, follow">';
+            }
+    	}
+        
+    }
+}
+
+add_action('wp_head', 'listeo_noindex_for_products');

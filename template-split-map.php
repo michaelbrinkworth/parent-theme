@@ -14,7 +14,6 @@ get_header('split');?>
 
 	<div class="fs-inner-container content">
 		<div class="fs-content">
-			<?php echo do_shortcode('[listing-category]'); ?>
 
 			<!-- Search -->
 

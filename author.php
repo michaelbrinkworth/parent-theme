@@ -16,8 +16,6 @@ $email = $user_info->user_email;
 ?>
 <!-- Titlebar
 ================================================== -->
-
-
 <div id="titlebar" class="gradient">
     <div class="container">
         <div class="row">
@@ -30,7 +28,7 @@ $email = $user_info->user_email;
 						$first_name = $user_info->first_name;
 						$last_name = $user_info->last_name;
 						if($first_name || $last_name) {
-							 echo esc_html($user_info->first_name); ?> AAAAAA <?php echo esc_html($user_info->last_name); 
+							 echo esc_html($user_info->first_name); ?> <?php echo esc_html($user_info->last_name); 
 							} else {
 								echo esc_html($user_info->user_login);
 						}
@@ -96,15 +94,22 @@ $email = $user_info->user_email;
 				<h3><?php esc_html_e('Contact','listeo'); ?></h3>
 
 				<?php 
-					if(is_user_logged_in() ){
+					$visibility_setting = get_option('listeo_user_contact_details_visibility'); // hide_all, show_all, show_logged, show_booked,  
+					if($visibility_setting == 'hide_all') {
+						$show_details = false;
+					} elseif ($visibility_setting == 'show_all') {
 						$show_details = true;
 					} else {
-						if(get_option('listeo_user_contact_details_visibility')){
-							$show_details = false;
+						if(is_user_logged_in() ){
+							if($visibility_setting == 'show_logged'){
+								$show_details = true;
+							} else {
+								$show_details = false;
+							}
 						} else {
-							$show_details = true;
+							$show_details = false;
 						}
-					}
+					}	
 					if($show_details){ ?>
 						<ul class="listing-details-sidebar">
 							<?php if(isset($user_info->phone) && !empty($user_info->phone)) : ?>
@@ -118,7 +123,7 @@ $email = $user_info->user_email;
 						<p><?php printf( esc_html__( 'Please %s sign %s in to see contact details.', 'listeo' ), '<a href="#sign-in-dialog" class="sign-in popup-with-zoom-anim">', '</a>' ) ?></p>
 						
 					<?php } ?>
-
+				<?php if($show_details){ ?>
 				<ul class="listing-details-sidebar social-profiles">
 					<?php if(isset($user_info->twitter) && !empty($user_info->twitter)) : ?><li><a href="<?php echo esc_url($user_info->twitter) ?>" class="twitter-profile"><i class="fa fa-twitter"></i> Twitter</a></li><?php endif; ?>
 					<?php if(isset($user_info->facebook) && !empty($user_info->facebook)) : ?><li><a href="<?php echo esc_url($user_info->facebook) ?>" class="facebook-profile"><i class="fa fa-facebook-square"></i> Facebook</a></li><?php endif; ?>
@@ -127,6 +132,7 @@ $email = $user_info->user_email;
 					<?php if(isset($user_info->youtube) && !empty($user_info->youtube)) : ?><li><a href="<?php echo esc_url($user_info->youtube) ?>" class="youtube-profile"><i class="fa fa-youtube"></i> YouTube</a></li><?php endif; ?>
 					
 				</ul>
+				<?php } ?>
 
 				<!-- Reply to review popup -->
 				<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
@@ -134,19 +140,12 @@ $email = $user_info->user_email;
 						<h3><?php esc_html_e('Send Message', 'listeo'); ?></h3>
 					</div>
 					<div class="message-reply margin-top-0">
-						<form action="" id="send-message-from-widget"  >
-							<!-- enctype="multipart/form-data" -->
+						<form action="" id="send-message-from-widget" >
 							<textarea 
 							required
 							data-recipient="<?php echo esc_attr($user->ID); ?>"  
 							data-referral="author_archive"  
 							cols="40" id="contact-message" name="message" rows="3" placeholder="<?php esc_attr_e('Your message to ','listeo'); echo esc_attr($user_info->first_name); ?>"></textarea>
-							<!-- <div class="choose-file-wrapper">
-								<div class="choose-file">Choose files</div>
-								<span class="selected-files"></span>
-							</div>
-							<input type="file" name="images[]" id="fileInput" multiple style="display: none;"> --> 
-							
 							<button class="button">
 							<i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i><?php esc_html_e('Send Message', 'listeo'); ?></button>	
 							<div class="notification closeable success margin-top-20"></div>
