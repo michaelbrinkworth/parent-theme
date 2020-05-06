@@ -54,7 +54,8 @@ $(document).ready(function(){
 					if ( startDataSql ) ajax_data.date_start = startDataSql;
 					if ( endDataSql ) ajax_data.date_end = endDataSql;
 					if ( $('input#slot').val() ) ajax_data.slot = $('input#slot').val();
-					if ( $('.time-picker').val() ) ajax_data._hour = $('.time-picker').val();
+					if ( $('.time-picker#_hour').val() ) ajax_data._hour = $('.time-picker#_hour').val();
+					if ( $('.time-picker#_hour_end').val() ) ajax_data._hour_end = $('.time-picker#_hour_end').val();
 					if ( $('.adults').val() ) ajax_data.adults = $('.adults').val();
 					if ( $('.childrens').val() ) ajax_data.childrens = $('.childrens').val();
 					if ( $('#tickets').val() ) ajax_data.tickets = $('#tickets').val();
@@ -74,9 +75,13 @@ $(document).ready(function(){
 					if(invalid == false) {
 
 						var services = [];
-	 					$.each($("input[name='_service[]']:checked"), function(){            
-	                		services.push($(this).val());
-	            		});
+	 					// $.each($("input[name='_service[]']:checked"), function(){            
+	      //           		services.push($(this).val());
+	      //       		});
+	            		$.each($("input.bookable-service-checkbox:checked"), function(){   
+							var quantity = $(this).parent().find('input.bookable-service-quantity').val();
+				    		services.push({"service" : $(this).val(), "value" : quantity});
+						});
 	            		ajax_data.services = services;
 						$('input#booking').val( JSON.stringify( ajax_data ) );
 						$('#form-booking').submit();
@@ -100,9 +105,10 @@ $(document).ready(function(){
 				//'nonce': nonce		
 			};
 			var services = [];
-				$.each($("input[name='_service[]']:checked"), function(){            
-        		services.push($(this).val());
-    		});
+			$.each($("input.bookable-service-checkbox:checked"), function(){   
+				var quantity = $(this).parent().find('input.bookable-service-quantity').val();
+	    		services.push({"service" : $(this).val(), "value" : quantity});
+			});
     		ajax_data.services = services;
 			
 			// converent data
@@ -166,7 +172,7 @@ $(document).ready(function(){
 		timePicker: true,
 		autoUpdateInput: false,
 		timePicker24Hour: Boolean(listeo_core.clockformat),
-		//minDate: moment().subtract(0, 'days'),
+		minDate: moment().subtract(0, 'days'),
 		
 		locale: {
 			format 			: dateformat_even,
@@ -177,13 +183,27 @@ $(document).ready(function(){
 	        "toLabel"		: listeo_core.toLabel,
 	        "customRangeLabel": listeo_core.customRangeLabel,
 	        "daysOfWeek": [
-	            listeo_core.day_short_su,
-	            listeo_core.day_short_mo,
-	            listeo_core.day_short_tu,
-	            listeo_core.day_short_we,
-	            listeo_core.day_short_th,
-	            listeo_core.day_short_fr,
-	            listeo_core.day_short_sa
+		            listeo_core.day_short_su,
+		            listeo_core.day_short_mo,
+		            listeo_core.day_short_tu,
+		            listeo_core.day_short_we,
+		            listeo_core.day_short_th,
+		            listeo_core.day_short_fr,
+		            listeo_core.day_short_sa
+	        ],
+	        "monthNames": [
+	            listeo_core.january,
+	            listeo_core.february,
+	            listeo_core.march,
+	            listeo_core.april,
+	            listeo_core.may,
+	            listeo_core.june,
+	            listeo_core.july,
+	            listeo_core.august,
+	            listeo_core.september,
+	            listeo_core.october,
+	            listeo_core.november,
+	            listeo_core.december,
 	        ],
 	  	},
 	  
@@ -250,7 +270,7 @@ $(document).ready(function(){
 	        "fromLabel"		: listeo_core.fromLabel,
 	        "toLabel"		: listeo_core.toLabel,
 	        "customRangeLabel": listeo_core.customRangeLabel,
-	         "daysOfWeek": [
+	        "daysOfWeek": [
 	            listeo_core.day_short_su,
 	            listeo_core.day_short_mo,
 	            listeo_core.day_short_tu,
@@ -258,7 +278,21 @@ $(document).ready(function(){
 	            listeo_core.day_short_th,
 	            listeo_core.day_short_fr,
 	            listeo_core.day_short_sa
-	        ],  
+	        ],
+	        "monthNames": [
+	            listeo_core.january,
+	            listeo_core.february,
+	            listeo_core.march,
+	            listeo_core.april,
+	            listeo_core.may,
+	            listeo_core.june,
+	            listeo_core.july,
+	            listeo_core.august,
+	            listeo_core.september,
+	            listeo_core.october,
+	            listeo_core.november,
+	            listeo_core.december,
+	        ],
 	      
 		},
 
@@ -319,8 +353,15 @@ $(document).ready(function(){
 			//'nonce': nonce		
 		};
 		var services = [];
-			$.each($("input[name='_service[]']:checked"), function(){            
-    		services.push($(this).val());
+		// $.each($("input.bookable-service-checkbox:checked"), function(){            
+  //   		services.push($(this).val());
+		// });
+		// $.each($("input.bookable-service-quantity"), function(){            
+  //   		services.push($(this).val());
+		// });
+		$.each($("input.bookable-service-checkbox:checked"), function(){   
+			var quantity = $(this).parent().find('input.bookable-service-quantity').val();
+    		services.push({"service" : $(this).val(), "value" : quantity});
 		});
 		ajax_data.services = services;
 		$.ajax({
@@ -374,9 +415,17 @@ $(document).ready(function(){
 			//'nonce': nonce		
 		};
 		var services = [];
-		$.each($("input[name='_service[]']:checked"), function(){            
-    		services.push($(this).val());
+		// $.each($("input.bookable-service-checkbox:checked"), function(){            
+  //   		services.push($(this).val());
+		// });
+		// $.each($("input.bookable-service-quantity"), function(){            
+  //   		services.push($(this).val());
+		// });
+		$.each($("input.bookable-service-checkbox:checked"), function(){   
+			var quantity = $(this).parent().find('input.bookable-service-quantity').val();
+    		services.push({"service" : $(this).val(), "value" : quantity});
 		});
+	
 		ajax_data.services = services;
 		
 		if ( $('input#slot').val() ) ajax_data.slot = $('input#slot').val();
@@ -601,7 +650,7 @@ $(document).ready(function(){
 	$( '#date-picker' ).on( 'apply.daterangepicker', check_booking );
 	$( '#date-picker' ).on( 'cancel.daterangepicker', check_booking );
 	
-	$(document).on("change", 'input#slot,input.adults.count_per_guest, .form-booking-service input.bookable-service-checkbox,.form-booking-rental input.bookable-service-checkbox', function(event) {
+	$(document).on("change", 'input#slot,input.adults, input.bookable-service-quantity, .form-booking-service input.bookable-service-checkbox,.form-booking-rental input.bookable-service-checkbox', function(event) {
 		check_booking();
 	}); 
 	//$('input#slot').on( 'change', check_booking );
@@ -619,12 +668,13 @@ $(document).ready(function(){
 		if(listeo_core.clockformat){
 			time24 = true;
 		}
-		$(".time-picker").flatpickr({
+		const calendars = $(".time-picker").flatpickr({
 			enableTime: true,
 			noCalendar: true,
 			dateFormat: "H:i",
 			time_24hr: time24,
  			disableMobile: "true",
+ 			
 
 			// check if there are free days on change and calculate price
 			onChange: function(selectedDates, dateStr, instance) {
@@ -633,7 +683,20 @@ $(document).ready(function(){
 			},
 
 		});
-	 
+		
+		if($('#_hour_end').length) {
+			calendars[0].config.onClose = [() => {
+			  setTimeout(() => calendars[1].open(), 1);
+			}];
+
+			calendars[0].config.onChange = [(selDates) => {
+			  calendars[1].set("minDate", selDates[0]);
+			}];
+
+			calendars[1].config.onChange = [(selDates) => {
+			  calendars[0].set("maxDate", selDates[0]);
+			}]
+		}	 
 	};
 	
 
@@ -641,6 +704,18 @@ $(document).ready(function(){
 /*----------------------------------------------------*/
 /*  Bookings Dashboard Script
 /*----------------------------------------------------*/
+$(".booking-services").on("click", '.qtyInc', function() {
+	  var $button = $(this);
+
+      var oldValue = $button.parent().find("input").val();
+      console.log(oldValue);
+      if(oldValue == 2) {
+      	//$button.parents('.single-service').find('label').trigger('click');
+      	$button.parents('.single-service').find('input.bookable-service-checkbox').prop("checked",true);
+      	updateCounter();
+      }
+});
+
 
 if ( $( "#booking-date-range" ).length ) {
 
@@ -902,6 +977,20 @@ if(!page) { page = 1 }
 		            listeo_core.day_short_th,
 		            listeo_core.day_short_fr,
 		            listeo_core.day_short_sa
+		        ],
+		        "monthNames": [
+		            listeo_core.january,
+		            listeo_core.february,
+		            listeo_core.march,
+		            listeo_core.april,
+		            listeo_core.may,
+		            listeo_core.june,
+		            listeo_core.july,
+		            listeo_core.august,
+		            listeo_core.september,
+		            listeo_core.october,
+		            listeo_core.november,
+		            listeo_core.december,
 		        ],
 		  	}
 	    }, cb).trigger('click');

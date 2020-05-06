@@ -39,26 +39,37 @@ if(isset($details_list['fields'])) :
 		if($meta_value == 'check_on' || $meta_value == 'on') {
 			$output .= '<li class="checkboxed single-property-detail-'.$value['id'].'">'. $value['name'].'</li>';	
 		} else {
-		
-			if($value['type'] == 'datetime'){
-				$convertedData = listeo_date_time_wp_format_php();
-				$clock_format = get_option('listeo_clock_format');
-				if($clock_format == "24") {
-					$dateformated = DateTime::createFromFormat($convertedData.' H:i', $meta_value);	
-				} else {
-					$dateformated = DateTime::createFromFormat($convertedData.' h:i A', $meta_value);	
-				}
-				
-				
-				if($dateformated){
-					$date_format = get_option( 'date_format' );
-					$time_format = get_option( 'time_format' );
-					$meta_value = $dateformated->format($date_format);
-					$meta_value .= ' - '. $dateformated->format($time_format);
-				}
+			if(!empty($meta_value)){
+				if($value['type'] == 'datetime' || in_array($value['id'], array('_event_date','_event_date_end')) ){
 
+						$meta_value = date_i18n(get_option( 'date_format' ), strtotime($meta_value)); 
+						
+						$meta_value_date = explode(' ', $meta_value); 
+						
+						if( isset($meta_value_date[1]) ) { 
+
+							$meta_value .= esc_html__(' at ','listeo_core'); 
+							$meta_value .= date_i18n(get_option( 'time_format' ), strtotime($meta_value_date[1]));
+
+						}
+					// $convertedData = listeo_date_time_wp_format_php();
+					// $clock_format = get_option('listeo_clock_format');
+					// if($clock_format == "24") {
+					// 	$dateformated = DateTime::createFromFormat($convertedData.' H:i', $meta_value);	
+					// } else {
+					// 	$dateformated = DateTime::createFromFormat($convertedData.' h:i A', $meta_value);	
+					// }
+					
+					
+					// if($dateformated){
+					// 	$date_format = get_option( 'date_format' );
+					// 	$time_format = get_option( 'time_format' );
+					// 	$meta_value = $dateformated->format($date_format);
+					// 	$meta_value .= ' - '. $dateformated->format($time_format);
+					// }
+
+				}
 			}
-
 			if(in_array($value['id'], array('_id','_ID','_Id'))){
 				$meta_value = apply_filters('listeo_listing_id',$post->ID);
 			}

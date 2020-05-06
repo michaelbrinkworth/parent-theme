@@ -166,11 +166,6 @@ else: ?>
 					<li><a href="#listing-location"><?php esc_html_e('Location','listeo_core'); ?></a></li>
 					<?php 
 					endif;
-					if(get_post_meta( $post->ID, '_cancellation_policy', true) != '') {
-					?>
-						<li><a href="#listing-cancellation_policy"><?php esc_html_e('Cancellation policy','listeo_core'); ?></a></li>	
-					<?php
-					}
 					if(!get_option('listeo_disable_reviews')){
 						$reviews = get_comments(array(
 						    'post_id' => $post->ID,
@@ -202,15 +197,9 @@ else: ?>
 			<?php $template_loader->get_template_part( 'single-partials/single-listing','opening' );  ?>
 			<?php $template_loader->get_template_part( 'single-partials/single-listing','video' );  ?>
 			<?php $template_loader->get_template_part( 'single-partials/single-listing','location' );  ?>
-			<?php
-				if(get_post_meta( $post->ID, '_cancellation_policy', true) != '') {
-					$template_loader->get_template_part( 'single-partials/single-listing','cancellation_policy' );  
-				}
-			?>
 			<?php if(!get_option('listeo_disable_reviews')){ 
 				$template_loader->get_template_part( 'single-partials/single-listing','reviews' ); } ?>
 			
-            <?php // echo do_shortcode('[grw place_photo="https://maps.gstatic.com/mapfiles/place_api/icons/generic_business-71.png" place_name="Royal Wedding Cars" place_id="ChIJJezz7RzKWTkR19CpdHAyS7o" pagination="5" text_size="120" refresh_reviews=true lazy_load_img=true reduce_avatars_size=true open_link=true nofollow_link=true]'); ?>
 		</div>
 		<?php endwhile; // End of the loop. ?>
 		<!-- Sidebar
@@ -226,7 +215,10 @@ else: ?>
 					if(get_option('listeo_claim_page_button')){
 					$claim_page = get_option('listeo_claim_page');?>
 					<div class="claim-badge with-tip" data-tip-content="<?php esc_html_e('Click to claim this listing.','listeo_core'); ?>">
-						<a href="<?php echo get_permalink($claim_page); ?>"><i class="sl sl-icon-question"></i> <?php esc_html_e('Not verified. Claim this listing!','listeo_core') ?></a>
+						<?php 
+						$link =  add_query_arg ('subject', get_permalink(), get_permalink($claim_page)) ; ?>
+
+						<a href="<?php echo $link; ?>"><i class="sl sl-icon-question"></i> <?php esc_html_e('Not verified. Claim this listing!','listeo_core') ?></a>
 					</div>
 					<?php }
 

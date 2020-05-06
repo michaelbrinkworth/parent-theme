@@ -119,6 +119,8 @@ class Listeo_Core {
 		include( 'class-listeo-core-commissions.php' );
 		include( 'class-listeo-core-payouts.php' );
 		include( 'class-listeo-core-bookings-admin.php' );
+		include( 'class-icalreader.php' );
+		include( 'class-listeo-core-ical.php' );
 		// include( 'class-listeo-core-compare.php' );
 		
 		// Load frontend JS & CSS
@@ -154,6 +156,7 @@ class Listeo_Core {
 		$this->emails 		= Listeo_Core_Emails::instance();
 		$this->commissions 	= Listeo_Core_Commissions::instance();
 		$this->payouts 		= Listeo_Core_Payouts::instance();
+		$this->ical 		= Listeo_Core_iCal::instance();
 		
 		
 		
@@ -317,6 +320,7 @@ class Listeo_Core {
 		$currency = get_option( 'listeo_currency' );
 		$currency_symbol = Listeo_Core_Listing::get_currency_symbol($currency); 
 		
+		
 		$localize_array = array(
 				'ajax_url'                	=> $ajax_url,
 				'is_rtl'                  	=> is_rtl() ? 1 : 0,
@@ -384,14 +388,32 @@ class Listeo_Core {
 	            "radius_state" => get_option('listeo_radius_state'),
 	            "maps_autofit" => get_option('listeo_map_autofit','on'),
 	            "maps_autolocate" 	=> get_option('listeo_map_autolocate'),
-	            "maps_zoom" 		=> get_option('listeo_map_zoom_global',9),
-	            "maps_single_zoom" 	=> get_option('listeo_map_zoom_single',15),
+	            "maps_zoom" 		=> (!empty(get_option('listeo_map_zoom_global'))) ? get_option('listeo_map_zoom_global') : 9,
+	            "maps_single_zoom" 	=> (!empty(get_option('listeo_map_zoom_single'))) ? get_option('listeo_map_zoom_single') : 9,
 	            "autologin" 	=> get_option('listeo_autologin'),
 	            "no_results_text" 	=> esc_html__('No results match','listeo_core'),
 	            "placeholder_text_single" 	=> esc_html__('Select an Option','listeo_core'),
 	            "placeholder_text_multiple" => esc_html__('Select Some Options ','listeo_core'),
-
-
+	            "january" => esc_html__("January",'listeo_core'),
+		        "february" => esc_html__("February",'listeo_core'),
+		        "march" => esc_html__("March",'listeo_core'),
+				"april" => esc_html__("April",'listeo_core'),
+		        "may" => esc_html__("May",'listeo_core'),
+		        "june" => esc_html__("June",'listeo_core'),
+		        "july" => esc_html__("July",'listeo_core'),
+		        "august" => esc_html__("August",'listeo_core'),
+		        "september" => esc_html__("September",'listeo_core'),
+		        "october" => esc_html__("October",'listeo_core'),
+		        "november" => esc_html__("November",'listeo_core'),
+		        "december" => esc_html__("December",'listeo_core'),
+		        "opening_time" => esc_html__("Opening Time",'listeo_core'),
+		        "closing_time" => esc_html__("Closing Time",'listeo_core'),
+		        "remove" => esc_html__("Remove",'listeo_core'),
+		        "onetimefee" => esc_html__("One time fee",'listeo_core'),
+		        "multiguest" => esc_html__("Multiply by guests",'listeo_core'),
+		        "multidays" => esc_html__("Multiply by days",'listeo_core'),
+		        "multiguestdays" => esc_html__("Multiply by guest & days",'listeo_core'),
+		        "quantitybuttons" => esc_html__("Quantity Buttons",'listeo_core'),
 			);
 		$criteria_fields = listeo_get_reviews_criteria();
 		

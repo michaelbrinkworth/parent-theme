@@ -19,8 +19,8 @@ if(isset($data->taxonomy) && !empty($data->taxonomy)) {
 	}	
 	foreach ($data->options as $key => $value) { ?>
 
-		<input <?php if ( array_key_exists ($value['slug'], $selected) ) { echo 'checked="checked"'; } ?> id="<?php echo esc_html($value['slug']) ?>" value="<?php echo esc_html($value['slug']) ?>" type="checkbox" name="<?php echo $data->name.'['.esc_html($value['slug']).']'; ?>">
-		<label for="<?php echo esc_html($value['slug']) ?>"><?php echo esc_html($value['name']) ?></label>
+		<input <?php if ( array_key_exists ($value['slug'], $selected) ) { echo 'checked="checked"'; } ?> id="<?php echo esc_html($value['slug']) ?>-<?php echo esc_attr($data->name); ?>" value="<?php echo esc_html($value['slug']) ?>" type="checkbox" name="<?php echo $data->name.'['.esc_html($value['slug']).']'; ?>">
+		<label for="<?php echo esc_html($value['slug']) ?>-<?php echo esc_attr($data->name); ?>"><?php echo esc_html($value['name']) ?></label>
 	
 <?php } 
 }
@@ -50,8 +50,8 @@ if(isset($data->options_source) && empty($data->taxonomy) ) {
 	}
 	foreach ($data->options as $key => $value) { ?>
 
-		<input <?php if ( array_key_exists ($key, $selected) ) { echo 'checked="checked"'; } ?> id="<?php echo esc_html($key) ?>" type="checkbox" name="<?php echo $data->name.'['.esc_html($key).']'; ?>">
-		<label for="<?php echo esc_html($key) ?>"><?php echo esc_html($value) ?></label>
+		<input <?php if ( array_key_exists ($key, $selected) ) { echo 'checked="checked"'; } ?> id="<?php echo esc_html($key) ?>-<?php echo esc_attr($data->name); ?>" type="checkbox" name="<?php echo $data->name.'['.esc_html($key).']'; ?>">
+		<label for="<?php echo esc_html($key) ?>-<?php echo esc_attr($data->name); ?>"><?php echo esc_html($value) ?></label>
 	
 <?php } 
 }

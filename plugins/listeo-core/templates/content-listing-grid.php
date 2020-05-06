@@ -16,15 +16,16 @@ $is_featured = listeo_core_is_featured($post->ID);
         <div class="col-lg-4 col-md-6"> 
     <?php endif ?>
 <?php } ?>
-<div class="listing-item-container listing-geo-data listo-main-box-sec"  <?php echo listeo_get_geo_data($post); ?>>
-<!--<a href="<?php //the_permalink(); ?>" class="listing-item-container listing-geo-data"  <?php echo listeo_get_geo_data($post); ?>>-->
-    <div class="listing-item listeo_grid_view_item listo-list-iteam <?php if($is_featured){ ?>featured-listing<?php } ?>">
+<a href="<?php the_permalink(); ?>" class="listing-item-container listing-geo-data"  <?php echo listeo_get_geo_data($post); ?>>
+    <div class="listing-item  <?php if($is_featured){ ?>featured-listing<?php } ?>">
         
-        <div class="listing-small-badges-container listo-new-container">
+        <div class="listing-small-badges-container">
             <?php if($is_featured){ ?>
                 <div class="listing-small-badge featured-badge"><i class="fa fa-star"></i> <?php esc_html_e('Featured','listeo_core'); ?></div>
             <?php } ?>
-            
+            <?php if(get_the_listing_price_range()): ?>
+                <div class="listing-small-badge pricing-badge"><i class="fa fa-<?php echo esc_attr(get_option('listeo_price_filter_icon','tag')); ?>"></i><?php echo get_the_listing_price_range(); ?></div>
+            <?php endif; ?>
             <?php  
             if( $listing_type  == 'event') { 
                 
@@ -44,10 +45,8 @@ $is_featured = listeo_core_is_featured($post->ID);
             }  ?>
             
         </div>
-       
         <?php 
-		$template_loader->get_template_part( 'content-listing-image');  ?>	
-       
+		$template_loader->get_template_part( 'content-listing-image');  ?>
         
         <?php
         
@@ -62,7 +61,7 @@ $is_featured = listeo_core_is_featured($post->ID);
         } 
        ?>
         
-        <div class="listing-item-content listo-new-listing-iteam">
+        <div class="listing-item-content">
 
             <?php 
             $terms = get_the_terms( get_the_ID(), 'listing_category' );            
@@ -70,79 +69,51 @@ $is_featured = listeo_core_is_featured($post->ID);
                 $main_term = array_pop($terms); ?>
                 <span class="tag"><?php echo $main_term->name; ?></span>
             <?php endif; ?>
-           
-			    <?php
-        if(!get_option('listeo_disable_reviews'))
-        {
-             $rating = get_post_meta($post->ID, 'listeo-avg-rating', true); 
-                if(isset($rating) && $rating > 0 ) : $rating_type = get_option('listeo_rating_type','star');
-                if($rating_type == 'numerical') 
-                { ?>
-                    <div class="numerical-rating" data-rating="<?php $rating_value = esc_attr(round($rating,1)); printf("%0.1f",$rating_value); ?>">
-                <?php 
-                } 
-                else 
-                { ?>
-                    <div class="star-rating listo-new-star-rating" data-rating="1"> 
-                    	
-                    	<h6><?php echo $rating; ?></h6> 
-                <?php 
-                } 
-                ?>
-                <?php $number = listeo_get_reviews_number($post->ID);  
-                ?>
-                <div class="rating-counter">(<?php printf( _n( '%s review', '%s reviews', $number,'listeo_core' ), number_format_i18n( $number ) );  ?>)</div>
-                
-                </div>
-        <?php else: ?>
-                <div class="star-rating listo-new-star-rating" >
-                    
-                    <div class="rating-counter"><span><?php esc_html_e('No reviews yet','listeo_core') ?></span></div>
-                </div>
-        <?php endif;
-        } ?>
-         <?php if(get_the_listing_address()) { ?><span><?php the_listing_address(); ?></span><?php } ?>
-            <h3 class="listeo_single_list_title listo-hed-h3-new"><a target="_blank" href="<?php the_permalink(); ?>"><?php the_title(); ?> <?php if( get_post_meta($post->ID,'_verified',true ) == 'on') : ?><i class="verified-icon"></i><?php endif; ?></a></h3>
-            <p style="font-size: 14px !important;line-height: 20px !important;">
-            <?php $content = get_the_content();
-           echo $content2 = substr($content,0,175);
-            ?>...
-            	
-            </p>
-            
+
+            <h3><?php the_title(); ?> <?php if( get_post_meta($post->ID,'_verified',true ) == 'on') : ?><i class="verified-icon"></i><?php endif; ?></h3>
+            <?php if(get_the_listing_address()) { ?><span><?php the_listing_address(); ?></span><?php } ?>
 
         </div>
         <?php 
         if( listeo_core_check_if_bookmarked($post->ID) ) { 
                 $nonce = wp_create_nonce("listeo_core_bookmark_this_nonce"); ?>
-                <span class="like-icon listeo_core-unbookmark-it liked listo-bookmark-icon-new"
+                <span class="like-icon listeo_core-unbookmark-it liked"
                 data-post_id="<?php echo esc_attr($post->ID); ?>" 
                 data-nonce="<?php echo esc_attr($nonce); ?>" ></span>
             <?php } else { 
                 if(is_user_logged_in()){ 
                     $nonce = wp_create_nonce("listeo_core_remove_fav_nonce"); ?>
-                    <span class="save listeo_core-bookmark-it like-icon listo-bookmark-icon-new" 
+                    <span class="save listeo_core-bookmark-it like-icon" 
                     data-post_id="<?php echo esc_attr($post->ID); ?>" 
                     data-nonce="<?php echo esc_attr($nonce); ?>" ></span>
                 <?php } else { ?>
-                    <span class="save like-icon tooltip left listo-bookmark-icon-new"  title="<?php esc_html_e('Login To Bookmark Items','listeo_core'); ?>"  ></span>
+                    <span class="save like-icon tooltip left"  title="<?php esc_html_e('Login To Bookmark Items','listeo_core'); ?>"  ></span>
                 <?php } ?>
         <?php } ?>
-                    <?php if(get_the_listing_regular_price()): ?>
-	            <div class="listing-small-badge pricing-badge listo-new-badge">
-	            	<!--<i class="fa fa-<?php echo esc_attr(get_option('listeo_price_filter_icon','tag')); ?>"></i>-->
-	            	<?php 
-	            		//echo get_the_listing_price_range(); 
-	            		echo get_the_listing_regular_price();
-	            	?>
-	            </div>
-	        <?php  endif; ?>
     </div>
     
-
+    <?php
+        if(!get_option('listeo_disable_reviews')){
+            $rating = get_post_meta($post->ID, 'listeo-avg-rating', true); 
+                if(isset($rating) && $rating > 0 ) : $rating_type = get_option('listeo_rating_type','star');
+                if($rating_type == 'numerical') { ?>
+                    <div class="numerical-rating" data-rating="<?php $rating_value = esc_attr(round($rating,1)); printf("%0.1f",$rating_value); ?>">
+                <?php } else { ?>
+                    <div class="star-rating" data-rating="<?php echo $rating; ?>">
+                <?php } ?>
+                <?php $number = listeo_get_reviews_number($post->ID);  ?>
+                <div class="rating-counter">(<?php printf( _n( '%s review', '%s reviews', $number,'listeo_core' ), number_format_i18n( $number ) );  ?>)</div>
+                
+                </div>
+        <?php else: ?>
+                <div class="star-rating" >
+                    
+                    <div class="rating-counter"><span><?php esc_html_e('No reviews yet','listeo_core') ?></span></div>
+                </div>
+        <?php endif;
+        } ?>
     
-</div>
-<!--</a>-->
+</a>
 
 <?php if(isset($style) && $style == 'grid') { ?>
     </div>

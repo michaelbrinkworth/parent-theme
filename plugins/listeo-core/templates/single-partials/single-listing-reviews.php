@@ -1,6 +1,11 @@
 	
 <?php
 global $post;
+
+	global $wpdb;
+
+ 	
+
 //Gather comments for a specific page/post 
 $comments = get_comments(array(
     'post_id' => $post->ID,
@@ -76,12 +81,7 @@ if ( $comments ) : ?>
 								<div class="nav-previous"><?php previous_comments_link( esc_html__( 'Older Comments', 'listeo_core' ) ); ?></div>
 								<div class="nav-next"><?php next_comments_link( esc_html__( 'Newer Comments', '$class = new _WP_List_Table_Compat( $screen, $columns );' ) ); ?></div>
 
-							</div><!-- .nav-links -->
-							<!-- <ul>
-								<li><a href="#" class="current-page">1</a></li>
-								<li><a href="#">2</a></li>
-								<li><a href="#"><i class="sl sl-icon-arrow-right"></i></a></li>
-							</ul> -->
+							</div>
 						</nav>
 					</div>
 				</div>
@@ -95,7 +95,7 @@ if ( $comments ) : ?>
 
 // If comments are closed and there are comments, let's leave a little note, shall we?
 if ( ! comments_open() ): ?>
-	<p class="no-comments"><?php esc_html_e( 'Comments are closed.', 'listeo_core' ); ?></p>
+	<p class="no-comments"><?php esc_html_e( 'Reviews are closed.', 'listeo_core' ); ?></p>
 <?php
 else : 
 	$owners_can_review = get_option('listeo_owners_can_review');
@@ -116,6 +116,7 @@ else :
 			$show_form = false;    ?>
 			<div class="margin-top-50"></div>
 		<?php } 
+
 	}
 	// Get the comments for the logged in user.
     $usercomment = false;
@@ -125,25 +126,48 @@ else :
             'post_id' => $post->ID,
     	) );
     }
-    
+
     if ( $usercomment ) {
     	
     	$show_form = false; 
     	//check if has pending
-    	$usercomment_peding = get_comments( array (
+    	$usercomment_pending = get_comments( array (
             'user_id' => get_current_user_id(),
             'post_id' => $post->ID,
             'status'  => 'hold'
     	) );
 
-     	if($usercomment_peding){ ?>
+     	if($usercomment_pending){ ?>
 			<div class="notification notice margin-bottom-50 margin-top-50"><p><?php esc_html_e("You've already reviewed this listing, your review is waiting for approval.",'listeo_core'); ?></p></div>
     	 
     	<?php } else { ?>
         <div class="notification notice margin-bottom-50 margin-top-50"><p><?php esc_html_e("Thank you for your review.",'listeo_core'); ?></p></div>
     	<?php } 
     }
+
+     if(get_option('listeo_reviews_only_booked')){
+	    $table_name = $wpdb->prefix . 'bookings_calendar';
+	  	$has_booked = $wpdb->get_results( $wpdb->prepare( "
+	            SELECT * FROM {$table_name}
+	            WHERE bookings_author = %d
+	            AND listing_id = %d
+	            
+		", get_current_user_id(),$post->ID ) );
+	    if(!empty($has_booked)){
+	    	$show_form = true; 
+	    } else {
+	    	$show_form = false;
+	    	?>
+	    		<div id="add-review" class="notification notice margin-bottom-50 margin-top-50"><p><?php esc_html_e("Only guests who have booked can leave a review.",'listeo_core'); ?></p></div>
+	    	<?php
+	    }
+    }
+    
 	
+
+	//check if user has bought
+
+	//get_current_user_id(),
 
 	if($show_form) { ?>
 	<div id="add-review" class="add-review-box">

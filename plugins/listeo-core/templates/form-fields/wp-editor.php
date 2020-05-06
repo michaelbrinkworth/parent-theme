@@ -5,6 +5,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 $field = $data->field;
 $key = $data->key;
 
+
+if(isset($field['description'])){
+	echo '<div class="notification closeable notice"><p class="description" id="'.$key.'-description">'.$field['description'].'</p></div>';
+}
+
+
 $editor = apply_filters( 'submit_listing_form_wp_editor_args', array(
 	'textarea_name' => isset( $field['name'] ) ? $field['name'] : $key,
 	'media_buttons' => false,

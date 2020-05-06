@@ -137,6 +137,9 @@ $sidebar_side = get_option('pp_listings_sidebar_layout');
 						$data .= ' data-region="'.get_query_var( 'region').'" ';
 						$data .= ' data-category="'.get_query_var( 'listing_category').'"; ';
 						$data .= ' data-feature="'.get_query_var( 'listing_feature').'"; ';
+						$data .= ' data-service-category="'.get_query_var( 'service_category').'"; ';
+						$data .= ' data-rental-category="'.get_query_var( 'rental_category').'"; ';
+						$data .= ' data-event-category="'.get_query_var( 'event_category').'"; ';
 						$orderby_value = isset( $_GET['listeo_core_order'] ) ? (string) $_GET['listeo_core_order']  : get_option( 'listeo_sort_by','date' );
 						?>
 						<div <?php echo $data; ?> data-orderby="<?php echo $orderby_value;  ?>" data-style="<?php echo esc_attr($content_layout) ?>" id="listeo-listings-container" >
@@ -152,8 +155,8 @@ $sidebar_side = get_option('pp_listings_sidebar_layout');
 									
 									case 'grid':
 										if ( $sidebar_side == 'full-width'){
-											echo '<div class="col-lg-4 col-md-6"> ';
-										} else { 
+											echo '<div class="col-lg-4 col-md-6 "> ';
+										} else {
 											echo '<div class="col-lg-6 col-md-12"> ';
 										}
 										

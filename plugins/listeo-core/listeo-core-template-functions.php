@@ -142,13 +142,28 @@ function get_the_listing_price( $post = null ) {
 	return Listeo_Core_Listing::get_listing_price( $post );
 }
 
-function get_the_listing_regular_price( $post = null ) {
-	return Listeo_Core_Listing::get_listing_regular_price( $post );
-}
 
 function get_the_listing_price_range( $post = null ) {
 	return Listeo_Core_Listing::get_listing_price_range( $post );
 }
+
+
+function listeo_get_saved_icals( $post = null ) {
+	return Listeo_Core_iCal::get_saved_icals( $post );
+} 
+
+function listeo_ical_export_url( $post_id = null ) {
+	return Listeo_Core_iCal::get_ical_export_url( $post_id );
+} 
+
+function listeo_get_ical_events( $post_id = null ) {
+	// $ical = new Listeo_Core_iCal;
+	// return $ical -> get_ical_events( $post_id );
+	return Listeo_Core_iCal::get_ical_events( $post_id );
+} 
+
+
+
 
 
 /**
@@ -408,19 +423,15 @@ function listeo_core_get_offer_types_flat($with_all = false){
 function listeo_core_get_options_array($type,$data) {
 	$options = array();
 	if($type == 'taxonomy'){
-	
 		$categories =  get_terms( $data, array(
-	    	'hide_empty' => false,
-	    	'parent' => 0,
-		) );		
-		
+		    'hide_empty' => false,
+		) );	
 		$options = array();
 		foreach ($categories as $cat) {
 			$options[$cat->term_id] = array ( 
 				'name'  => $cat->name,
 				'slug'  => $cat->slug,
 				'id'	=> $cat->term_id,
-				'taxonomy'	=> $cat->taxonomy,
 				);
 		}
 	}
@@ -986,8 +997,6 @@ if(!function_exists('cmb2_render_select_multiple_field_type')) {
 
 	function cmb2_save_select_multiple_callback( $override, array $args, array  $field_args ) {
 		if($field_args['type'] == 'select_multiple' || $field_args['type'] === 'multicheck_split') {
-			listeo_write_log($field_args['type']);
-			listeo_write_log($args['value']);
 			if ( is_array( $args['value'] ) ) {
 			
 				delete_post_meta($args['id'], $args['field_id']);
@@ -1359,7 +1368,7 @@ function listeo_get_review_reply($comment_id,$user_id){
 
 
 function listeo_check_if_open($post = ''){
-	
+
 	$status = false;
 	$has_hours = false;
 	if(empty($post)){
@@ -1370,63 +1379,134 @@ function listeo_check_if_open($post = ''){
 	$storeSchedule = array();
 	foreach ($days as $d_key => $value) {
 		$open_val = get_post_meta($post->ID, '_'.$d_key.'_opening_hour', true);
+
 		$opening = ($open_val) ? $open_val : '' ;
 		$clos_val = get_post_meta($post->ID, '_'.$d_key.'_closing_hour', true);
 		$closing = ($clos_val) ? $clos_val : '';
-		if(is_numeric(substr($opening, 0, 1))) {
-			$has_hours = true;
-		}
+		
+		
+		
 		$storeSchedule[$d_key] = array(
 			'opens' => $opening,
 			'closes' => $closing
 		);
+		
 	}
 
 	$clock_format = get_option('listeo_clock_format');
-    //get current  time
-    $timeObject = new DateTime(null, liste_get_timezone());
-    
-    $timestamp 		= $timeObject->getTimeStamp();
-    $currentTime 	= $timeObject->setTimestamp($timestamp)->format('Hi');
-    $timezone		= get_option('timezone_string');
-	
 
+    //get current  time
+    $meta_timezone =  get_post_meta($post->ID, '_listing_timezone', true);
+
+    // echo $meta_timezone; echo "<br/>";
+    // echo get_option( 'timezone_string' );echo "<br/>";
+    // echo get_option( 'gmt_offset' );echo "<br/>";
+
+    // $timezone = (!empty($meta_timezone)) ? $meta_timezone : listeo_get_timezone() ;
+    // $timeObject = new DateTime(null, $timezone);
+    
+    if(empty($meta_timezone)) {
+
+	    $timeObject = new DateTime(null, listeo_get_timezone());
+	    $timestamp 		= $timeObject->getTimeStamp();
+		$currentTime 	= $timeObject->setTimestamp($timestamp)->format('Hi');
+		//echo $currentTime;		
+    } else {
+    	
+    	if(substr($meta_timezone,0,3) == "UTC"){
+			$meta_timezone = str_replace('UTC','Etc/GMT',$meta_timezone);
+    	}
+	    date_default_timezone_set($meta_timezone);
+	    $timeObject = new DateTime(null);
+	    $timestamp 		= $timeObject->getTimeStamp();
+	    $currentTime 	= $timeObject->setTimestamp($timestamp)->format('Hi');
+	    
+    }
+    
+
+    
 	if(isset($storeSchedule[lcfirst(date('l', $timestamp))])) :
+
+
 		$day = ($storeSchedule[lcfirst(date('l', $timestamp))]);
+
 		$startTime = $day['opens'];
 		$endTime = $day['closes'];
+		if(is_array($startTime)){
+			foreach ($startTime as $key => $start_time) {
+				# code...
+			$end_time = $endTime[$key];
+
+			if(!empty($start_time) && is_numeric(substr($start_time, 0, 1)) ) {
+				if(substr($start_time, -1)=='M'){
+					$start_time = DateTime::createFromFormat('h:i A', $start_time)->format('Hi');			
+				} else {
+					$start_time = DateTime::createFromFormat('H:i', $start_time)->format('Hi');			
+				}
+				
+		 	} 
+		       //create time objects from start/end times and format as string (24hr AM/PM)
+			if(!empty($end_time)  && is_numeric(substr($end_time, 0, 1))){
+				if(substr($end_time, -1)=='M'){
+					$end_time = DateTime::createFromFormat('h:i A', $end_time)->format('Hi');			
+				} else {
+					$end_time = DateTime::createFromFormat('H:i', $end_time)->format('Hi');
+				}
+		    } 
+		   
+		    if($end_time == '0000'){
+		    	$end_time = 2400;
+		    }
+
+	   		if((int)$start_time > (int)$end_time ) {
+	   			// midnight situation
+	   			$end_time = 2400 + (int)$end_time;
+	   		}
+
+	   		
+		        // check if current time is within the range
+		        if (((int)$start_time < (int)$currentTime) && ((int)$currentTime < (int)$end_time)) {
+		            return TRUE;
+		        }
+		        
+	        }
+		} else {
+
+			//backward compatibilty
+			if(!empty($startTime) && is_numeric(substr($startTime, 0, 1)) ) {
+				if(substr($startTime, -1)=='M'){
+					$startTime = DateTime::createFromFormat('h:i A', $startTime)->format('Hi');			
+				} else {
+					$startTime = DateTime::createFromFormat('H:i', $startTime)->format('Hi');			
+				}
+				
+		 	} 
+		       //create time objects from start/end times and format as string (24hr AM/PM)
+			if(!empty($endTime)  && is_numeric(substr($endTime, 0, 1))){
+				if(substr($endTime, -1)=='M'){
+					$endTime = DateTime::createFromFormat('h:i A', $endTime)->format('Hi');			
+				} else {
+					$endTime = DateTime::createFromFormat('H:i', $endTime)->format('Hi');
+				}
+		    } 
+		    if($endTime == '0000'){
+		    	$endTime = 2400;
+		    }
+		    
+	   		if((int)$startTime > (int)$endTime ) {
+	   			// midnight situation
+	   			$endTime = 2400 + (int)$endTime;
+	   		}
+	   		
+	        // check if current time is within the range
+	        if (((int)$startTime < (int)$currentTime) && ((int)$currentTime < (int)$endTime)) {
+	            return TRUE;
+	        }
+		}
 		
-		if(!empty($startTime) && is_numeric(substr($startTime, 0, 1)) ) {
-			if(substr($startTime, -1)=='M'){
-				$startTime = DateTime::createFromFormat('h:i A', $startTime)->format('Hi');			
-			} else {
-				$startTime = DateTime::createFromFormat('H:i', $startTime)->format('Hi');			
-			}
-			
-	 	} 
-	        //create time objects from start/end times and format as string (24hr AM/PM)
-		if(!empty($endTime)  && is_numeric(substr($endTime, 0, 1))){
-			if(substr($endTime, -1)=='M'){
-				$endTime = DateTime::createFromFormat('h:i A', $endTime)->format('Hi');			
-			} else {
-				$endTime = DateTime::createFromFormat('H:i', $endTime)->format('Hi');
-			}
-	    } 
-	    if($endTime == '0000'){
-	    	$endTime = 2400;
-	    }
-	    
-   		if((int)$startTime > (int)$endTime ) {
-   			// midnight situation
-   			$endTime = 2400 + (int)$endTime;
-   		}
-   		
-        // check if current time is within the range
-        if (((int)$startTime < (int)$currentTime) && ((int)$currentTime < (int)$endTime)) {
-            $status = TRUE;
-        }
     
 	endif;
+	
 	if($status == false) {
 		
 		if(isset($storeSchedule[lcfirst(date( 'l', strtotime ( '-1 day' , $timestamp )))])) :
@@ -1435,26 +1515,62 @@ function listeo_check_if_open($post = ''){
 				
 				$startTime = $day['opens'];
 				$endTime = $day['closes'];
-				if(!empty($startTime) && is_numeric(substr($startTime, 0, 1)) ) {
-					if(substr($startTime, -1)=='M'){
-						$startTime = DateTime::createFromFormat('h:i A', $startTime)->format('Hi');			
-					} else {
-						$startTime = DateTime::createFromFormat('H:i', $startTime)->format('Hi');			
+				
+				if(is_array($startTime)){
+					foreach ($startTime as $key => $start_time) {
+						
+						# code...
+						$end_time = $endTime[$key];
+						//backward
+						if(!empty($start_time) && is_numeric(substr($start_time, 0, 1)) ) {
+							if(substr($start_time, -1)=='M'){
+								$start_time = DateTime::createFromFormat('h:i A', $start_time)->format('Hi');			
+							} else {
+								$start_time = DateTime::createFromFormat('H:i', $start_time)->format('Hi');			
+							}
+							
+					 	} 
+					        //create time objects from start/end times and format as string (24hr AM/PM)
+						if(!empty($end_time)  && is_numeric(substr($end_time, 0, 1))){
+							if(substr($end_time, -1)=='M'){
+								$end_time = DateTime::createFromFormat('h:i A', $end_time)->format('Hi');			
+							} else {
+								$end_time = DateTime::createFromFormat('H:i', $end_time)->format('Hi');
+							}
+					    } 
+
+					  
+						if( ((int)$start_time > (int)$end_time) && (int)$currentTime < (int)$end_time ) {
+		 					return TRUE;
+
+						}
 					}
-					
-			 	} 
-			        //create time objects from start/end times and format as string (24hr AM/PM)
-				if(!empty($endTime)  && is_numeric(substr($endTime, 0, 1))){
-					if(substr($endTime, -1)=='M'){
-						$endTime = DateTime::createFromFormat('h:i A', $endTime)->format('Hi');			
-					} else {
-						$endTime = DateTime::createFromFormat('H:i', $endTime)->format('Hi');
-					}
-			    } 
+
+				} else {
+
+					//backward
+					if(!empty($startTime) && is_numeric(substr($startTime, 0, 1)) ) {
+						if(substr($startTime, -1)=='M'){
+							$startTime = DateTime::createFromFormat('h:i A', $startTime)->format('Hi');			
+						} else {
+							$startTime = DateTime::createFromFormat('H:i', $startTime)->format('Hi');			
+						}
+						
+				 	} 
+				        //create time objects from start/end times and format as string (24hr AM/PM)
+					if(!empty($endTime)  && is_numeric(substr($endTime, 0, 1))){
+						if(substr($endTime, -1)=='M'){
+							$endTime = DateTime::createFromFormat('h:i A', $endTime)->format('Hi');			
+						} else {
+							$endTime = DateTime::createFromFormat('H:i', $endTime)->format('Hi');
+						}
+				    } 
 					if( ((int)$startTime > (int)$endTime) && (int)$currentTime < (int)$endTime ) {
 	 					$status = TRUE;
 
 					}
+				}
+				
 				
 				
 		endif;
@@ -1465,7 +1581,7 @@ function listeo_check_if_open($post = ''){
 }
 
 
-function liste_get_timezone() {
+function listeo_get_timezone() {
 
     $tzstring = get_option( 'timezone_string' );
     $offset   = get_option( 'gmt_offset' );
@@ -1498,17 +1614,31 @@ function listeo_check_if_has_hours(){
 	$storeSchedule = array();
 	foreach ($days as $d_key => $value) {
 		$open_val = get_post_meta($post->ID, '_'.$d_key.'_opening_hour', true);
-		$opening = ($open_val) ? $open_val : '' ;
-		$clos_val = get_post_meta($post->ID, '_'.$d_key.'_closing_hour', true);
-		$closing = ($clos_val) ? $clos_val : '';
-		
-		if(is_numeric(substr($opening, 0, 1))) {
-			$has_hours = true;
+		if(is_array($open_val)){
+			
+			if(!empty($open_val)){
+				$has_hours = true;
+			}
+
+		} else {
+			
+			$opening = ($open_val) ? $open_val : '' ;	
+			if(is_numeric(substr($opening, 0, 1))) {
+				$has_hours = true;
+			}
+
 		}
-		$storeSchedule[$d_key] = array(
-			'opens' => $opening,
-			'closes' => $closing
-		);
+		
+		// $clos_val = get_post_meta($post->ID, '_'.$d_key.'_closing_hour', true);
+		// $closing = ($clos_val) ? $clos_val : '';
+		
+		// if(is_numeric(substr($opening, 0, 1))) {
+		// 	$has_hours = true;
+		// }
+		// $storeSchedule[$d_key] = array(
+		// 	'opens' => $opening,
+		// 	'closes' => $closing
+		// );
 	}
 	
 	return $has_hours;
@@ -1605,7 +1735,7 @@ function listeo_get_geo_data($post){
     	data-reviews="<?php echo esc_attr( listeo_get_reviews_number($post->ID)); ?>"
     	<?php } ?>
     	data-icon="<?php echo esc_attr($icon); ?>"
-		data-price="<?php echo get_the_listing_regular_price(); ?>"
+
     <?php 
     return ob_get_clean();
 }
@@ -2028,3 +2158,69 @@ function listeo_get_allowed_mime_types( $field = '' ){
 
 
 //listeo_fields_for_cmb2
+
+
+if(!function_exists('listeo_date_to_cal')) {
+    function listeo_date_to_cal($timestamp) {
+      return date('Ymd\THis\Z', $timestamp);
+    }
+}
+
+if(!function_exists('listeo_escape_string')) {
+    function listeo_escape_string($string) {
+      return preg_replace('/([\,;])/','\\\$1', $string);
+    }
+}
+
+function listeo_calculate_service_price($service, $guests, $days, $countable ){
+
+	if(isset($service['bookable_options'])) {
+		switch ($service['bookable_options']) {
+			case 'onetime':
+				$price = $service['price'];
+				break;
+			case 'byguest':
+				$price = $service['price'] * (int) $guests;
+				break;
+			case 'bydays':
+				$price = $service['price'] * (int) $days;
+				break;
+			case 'byguestanddays':
+				$price = $service['price'] * (int) $days * (int) $guests;
+				break;
+			default:
+				$price = $service['price'];
+				break;
+		}
+		return $price * (int)$countable;
+	} else {
+		return $service['price'] * (int)$countable;
+	}
+}
+
+function listeo_get_extra_services_html($arr) {
+	$output = '';
+	if(is_array($arr)){
+		$output .= '<ul>';
+		foreach ($arr as $key => $booked_service) {
+			$price = esc_html__('Free','listeo_core');
+			if(isset($booked_service->price)){
+				if($booked_service->price == 0) {
+					$price = esc_html__('Free','listeo_core');
+				} else {
+					$price = $booked_service->price;
+				}
+
+			}
+			
+			$output .= '<li>'.$booked_service->service->name.'<span class="services-list-price-tag">'.$price.'</span></li>';
+			
+			# code...
+		}
+		$output .= '</ul>';
+		return $output;
+	} else {
+		return wpautop( $arr );
+	}
+	
+}

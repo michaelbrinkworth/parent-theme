@@ -91,6 +91,9 @@ $template_loader = new Listeo_Core_Template_Loader;
 					$data .= ' data-region="'.get_query_var( 'region').'" ';
 					$data .= ' data-category="'.get_query_var( 'listing_category').'"; ';
 					$data .= ' data-feature="'.get_query_var( 'listing_feature').'"; ';
+					$data .= ' data-service-category="'.get_query_var( 'service_category').'"; ';
+					$data .= ' data-rental-category="'.get_query_var( 'rental_category').'"; ';
+					$data .= ' data-event-category="'.get_query_var( 'event_category').'"; ';
 					$orderby_value = isset( $_GET['listeo_core_order'] ) ? (string) $_GET['listeo_core_order']  : get_option( 'listeo_sort_by','date' );
 								?>
 					<!-- Listings -->

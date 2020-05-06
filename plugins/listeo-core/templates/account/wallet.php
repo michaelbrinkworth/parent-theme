@@ -11,11 +11,12 @@ $current_user = wp_get_current_user(); ?>
 
 	foreach ($commissions as $commission) { 
 		if($commission['status'] == "unpaid") :
-			if($order){
+			
 			$order = wc_get_order( $commission['order_id'] );
-			$total = $order->get_total();
-			$earning = (float) $total - $commission['amount'];
-			$balance = $balance + $earning;	
+			if($order){
+				$total = $order->get_total();
+				$earning = (float) $total - $commission['amount'];
+				$balance = $balance + $earning;	
 			}
 			
 		endif;
@@ -75,7 +76,7 @@ $current_user = wp_get_current_user(); ?>
 							<li class="unpaid"><?php esc_html_e('Fee','listeo_core'); ?>: <?php echo wc_price($commission['amount']); ?></li>
 							<li class="paid"><?php esc_html_e('Your Earning','listeo_core'); ?>: <span><?php echo wc_price($earning); ?></span></li>
 							<li><?php esc_html_e('Order','listeo_core'); ?>: #<?php echo $commission['order_id']; ?></li>
-							<li><?php esc_html_e('Date','listeo_core'); ?>: <?php echo date(get_option( 'date_format' ), strtotime($commission['date']));  ?></li>
+							<li><?php esc_html_e('Date','listeo_core'); ?>: <?php echo date_i18n(get_option( 'date_format' ), strtotime($commission['date']));  ?></li>
 						</ul>
 					</li>
 				<?php endif;
@@ -167,7 +168,7 @@ $current_user = wp_get_current_user(); ?>
 						<strong><?php echo wc_price($payout['amount']) ?></strong>
 						<ul>
 							<li class="payment_method"><?php echo ($payout['payment_method']=='paypal') ? esc_html__('PayPal','listeo_core') : esc_html__('Bank Transfer','listeo_core') ; ?></li>
-							<li>Date: <?php echo date(get_option( 'date_format' ), strtotime($payout['date']));  ?></li>
+							<li>Date: <?php echo date_i18n(get_option( 'date_format' ), strtotime($payout['date']));  ?></li>
 						</ul>
 					</li>
 					

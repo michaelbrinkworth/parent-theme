@@ -23,16 +23,26 @@ if($socials || $contacts) :
 
 <div class="listing-links-container">
 	<?php 
-	if($contacts) : 
+	$visibility_setting = get_option('listeo_user_contact_details_visibility'); // hide_all, show_all, show_logged, show_booked,  
+	if($visibility_setting == 'hide_all') {
+		$show_details = false;
+	} elseif ($visibility_setting == 'show_all') {
+		$show_details = true;
+	} else {
 		if(is_user_logged_in() ){
-			$show_details = true;
-		} else {
-			if(get_option('listeo_user_contact_details_visibility')){
-				$show_details = false;
-			} else {
+			if($visibility_setting == 'show_logged'){
 				$show_details = true;
+			} else {
+				$show_details = false;
 			}
+		} else {
+			$show_details = false;
 		}
+	}	
+		
+		
+	if($contacts) : 
+		
 		if($show_details){ ?>
 				
 			<ul class="listing-links contact-links">
@@ -56,7 +66,7 @@ if($socials || $contacts) :
 		<?php }
 	endif; ?>
 
-	<?php if($socials) : ?>
+	​<?php if($show_details && $socials) : ?>
 	<ul class="listing-links">
 		<?php if(isset($facebook) && !empty($facebook)): ?>
 		<li><a href="<?php echo esc_url($facebook); ?>" target="_blank" class="listing-links-fb"><i class="fa fa-facebook-square"></i> Facebook</a></li>

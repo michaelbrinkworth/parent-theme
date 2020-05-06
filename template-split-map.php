@@ -14,8 +14,9 @@ get_header('split');?>
 
 	<div class="fs-inner-container content">
 		<div class="fs-content">
+			<?php echo do_shortcode('[listing-category]'); ?>
 
-			<!-- Search -->
+				<!-- Search -->
 
 			<section class="search">
 				<a href="#" id="show-map-button" class="show-map-button" data-enabled="<?php  esc_attr_e('Show Map ','listeo'); ?>" data-disabled="<?php  esc_attr_e('Hide Map ','listeo'); ?>"><?php esc_html_e('Show Map ','listeo') ?></a>
@@ -26,7 +27,7 @@ get_header('split');?>
 					</div>
 				</div>
 
-			</section>
+		</section>
 			<!-- Search / End -->
 
 			<section class="listings-container margin-top-30">
@@ -50,7 +51,7 @@ get_header('split');?>
 					</div>
 			</section>
 
-		</div>
+			</div>
 	</div>
 	<div class="fs-inner-container map-fixed">
 
@@ -66,5 +67,3 @@ get_header('split');?>
 </div>
 
 <div class="clearfix"></div>
-
-<?php get_footer('empty'); ?>

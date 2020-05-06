@@ -116,7 +116,7 @@ $woocommerce->cart->empty_cart();
 	                </div>
 
                 <div class="plan-features">
-                    <ul>
+                    <ul class="plan-features-auto-wc">
                         <?php 
                         $listingslimit = $product->get_limit();
                         if(!$listingslimit){

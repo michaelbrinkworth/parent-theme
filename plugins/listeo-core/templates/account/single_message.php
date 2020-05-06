@@ -3,15 +3,7 @@
 //user_2 ten co dostaje
 if(isset($data)) :
 	$ids	 	= (isset($data->ids)) ? $data->ids : '' ;
-	/*if($_SERVER['REMOTE_ADDR'] == "123.201.19.159")
-	{
-		echo "<pre>ttttt";
-			print_r($ids);
-		echo "<pre>"; 
-		exit;
-	}*/
 endif;
-
 if( isset( $_GET["action"]) && $_GET["action"] == 'view' )  {
 
 	$messages = new Listeo_Core_Messages();
@@ -53,39 +45,7 @@ if( isset( $_GET["action"]) && $_GET["action"] == 'view' )  {
 			</div>
 
 			<div class="messages-container-inner">
-				<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
-					<div class="small-dialog-header">
-						<h3><?php esc_html_e('Create An Offer', 'listeo_core'); ?></h3>
-					</div>
-					<div class="message-reply margin-top-0">
-						<div>
-							<input type="hidden" id="user_id" name="user_id" value="<?php echo (int)$this_conv[0]->user_1; ?>" />
-							<input required type="text" name="listeo_offer_title" id="listeo_offer_title" placeholder="<?php esc_attr_e('Enter Offer Title','listeo_core');?>" />
-							<label class="listeo_title_label listeo_offer_validation_hide" for="listeo_offer_title">
-								<?php esc_attr_e('Please Enter Title','listeo_core');?>
-							</label>	
-						</div>						
-						<div>
-							<textarea required cols="40" id="listeo_offer_description" name="listeo_offer_description" rows="3" placeholder="<?php esc_attr_e('Enter Offer Description','listeo_core');?>"></textarea>
-							<label class="listeo_description_label listeo_offer_validation_hide" for="listeo_offer_title">
-								<?php esc_attr_e('Please Enter Description','listeo_core');?>
-							</label>
-						</div>
-						<div>
-							<input required type="number" name="listeo_offer_price" id="listeo_offer_price" placeholder="<?php esc_attr_e('Enter Offer Price','listeo_core');?>" />
-							<label class="listeo_price_label listeo_offer_validation_hide" for="listeo_offer_title">
-								<?php esc_attr_e('Please Enter Price','listeo_core');?>
-							</label>
-							<label class="listeo_invalid_price_label listeo_offer_validation_hide" for="listeo_offer_title">
-								<?php esc_attr_e('Please Enter Valid Price','listeo_core');?>
-							</label>
-						</div>
-						<button class="button" id="listeo_add_offer_btn">
-							<i class="fa fa-circle-o-notch fa-spin" aria-hidden="true"></i>
-							<?php esc_html_e('Create An Offer', 'listeo_core'); ?>
-						</button>		
-					</div>
-				</div>
+
 				<!-- Messages -->
 				<div class="messages-inbox">
 					<?php if($ids) { ?>
@@ -142,106 +102,27 @@ if( isset( $_GET["action"]) && $_GET["action"] == 'view' )  {
 				<!-- Message Content -->
 				<div class="message-content">
 					<div class="message-bubbles">
-					<?php
-						$current_user = wp_get_current_user();
-						$roles = $current_user->roles;
-						$role = array_shift( $roles );
-						
-						$conversation = $messages->get_single_conversation($current_user_id,$conversation_id);
-						/*echo "<pre>";
-						print_r($conversation);
-						die;*/
-						foreach ($conversation as $key => $message) { 
+						<?php
+							$conversation = $messages->get_single_conversation($current_user_id,$conversation_id);
+							foreach ($conversation as $key => $message) { 
+								?>
+								<div class="message-bubble <?php if($current_user_id == (int) $message->sender_id ) echo esc_attr('me'); ?>">
+									<div class="message-avatar"><a href="<?php echo esc_url(get_author_posts_url($message->sender_id)); ?>"><?php echo get_avatar($message->sender_id, '70') ?></a></div>
+									<div class="message-text"><?php echo wpautop($message->message) ?></div>
+								</div>
+							<?php }
 						?>
-							<?php 
-								if($message->is_offer_message == 0) {
-									?>
-									<div class="message-bubble <?php if($current_user_id == (int) $message->sender_id ) echo esc_attr('me'); ?>">
-										<div class="message-avatar">
-											<a href="<?php echo esc_url(get_author_posts_url($message->sender_id)); ?>">
-												<?php echo get_avatar($message->sender_id, '70') ?>
-											</a>
-										</div>
-										<div class="message-text">
-											<?php echo wpautop($message->message) ?>
-		                					<?php 
-		                                   		if($message->attachement_id){
-		                                       	?>
-		                                    	<div class="view-attachment">
-		                                        	<div class="btn-attachment">
-		                                            	<?php echo "View Attachments"; ?>
-		                                        	</div>
-		                                			<div class="message-attachment" style="display: none;">
-				                                        <?php
-				                                            $att_id = explode(',', $message->attachement_id);
-				                                            foreach ($att_id as $key => $value) {
-				                                                $url = wp_get_attachment_url($value);
-				                                                ?>
-				                                                <a class="download-image" href="<?php echo $url; ?>" title="<?php echo basename($url); ?>"  download>
-				                                                    <img src="<?php echo $url; ?>" width=50 height=50 />
-				                                                    <span class="image-title">
-				                                                        <!-- <i class="sl sl-icon-cloud-download"></i> -->
-				                                                        <i class="fa fa-download" aria-hidden="true"></i>
-				                                                    </span>
-				                                                </a>
-				                                         <?php } ?>                                  
-		                            				</div>
-		                            			</div>
-		                                <?php } ?> 
-		                                </div>
-		                               </div>
-									<?php
-								}
-								else if($message->is_offer_message == 1){
-										$message_arr = explode('~@@@~',$message->message);
-									?>
-										<div class="message-bubble <?php if($current_user_id == (int) $message->sender_id ) echo esc_attr('me'); ?>">
-											<div class="message-avatar">
-												<a href="<?php echo esc_url(get_author_posts_url($message->sender_id)); ?>">
-													<?php echo get_avatar($message->sender_id, '70') ?>
-												</a>
-											</div>
-											<div class="message-text listeo_is_offer_message_text">
-												<div class="listeo_is_offer_price_title">	
-													<h6><?php echo $message_arr[0]; ?></h6>
-													<span><?php echo $message_arr[2]; ?></span>
-												</div>
-												<div class="listeo_is_offer_desc_dtl">
-													<p><?php echo $message_arr[1]; ?></p>
-												</div>
-												<div class="listeo_offer_payment_url_btn"> 
-													<a target="_blank" href="<?php echo $message_arr[3]; ?>">pay</a> 
-												</div>
-												
-											</div>
-										</div>	
-									<?php
-								}
-							?>
-					<?php } ?>
-				</div>
+						
+					</div>
 					<img style="display: none; " src="<?php echo get_stylesheet_directory_uri(); ?>/images/loader.gif" alt="" class="loading">
 					<!-- Reply Area -->
 					<div class="clearfix"></div>
 					<div class="message-reply">
-						<form action="" id="send-message-from-chat" enctype="multipart/form-data" >
-							<!-- enctype="multipart/form-data" -->
+						<form action="" id="send-message-from-chat">
 							<textarea cols="40" id="contact-message" name="message" required rows="3" placeholder="<?php esc_html_e('Your Message', 'listeo_core'); ?>"></textarea>
 							<input type="hidden" id="conversation_id" name="conversation_id" value="<?php echo esc_attr($_GET["conv_id"]) ?>">
 							<input type="hidden" id="recipient" name="recipient" value="<?php echo esc_attr($adversary) ?>">
-
-							<div class="choose-file-wrapper">
-								<div class="choose-file">Choose files</div>
-								<span class="selected-files"></span>
-							</div>
-
-							<input type="file" name="images[]" id="fileInput" multiple style="display: none;"> 
-
-							<button class="button listeo_send_msg_btn"><?php esc_html_e('Send Message', 'listeo_core'); ?></button>
-							
-							<?php if(in_array($role,array('administrator','admin','owner'))) : ?>
-								<a class="button listeo_create_offer_btn popup-with-zoom-anim" href="#small-dialog"><?php esc_html_e('Create An Offer', 'listeo_core'); ?></a>
-							<?php endif; ?>
+							<button class="button"><?php esc_html_e('Send Message', 'listeo_core'); ?></button>
 						</form>
 					</div>
 					

@@ -98,7 +98,7 @@ if ( isset($_GET['updated']) && $_GET['updated'] == 'true' ) : ?>
 							?>
 			                <textarea name="description" id="description" cols="30" rows="10"><?php echo $user_desc_stripped; ?></textarea>
 
-							<!--<label><i class="fa fa-twitter"></i> <?php esc_html_e( 'Twitter', 'listeo_core' ); ?></label>
+							<label><i class="fa fa-twitter"></i> <?php esc_html_e( 'Twitter', 'listeo_core' ); ?></label>
 							<input class="text-input" name="twitter" type="text" id="twitter" value="<?php  echo $current_user->twitter; ?>" />
 
 							<label><i class="fa fa-facebook-square"></i> <?php esc_html_e( 'Facebook', 'listeo_core' ); ?></label>
@@ -119,7 +119,7 @@ if ( isset($_GET['updated']) && $_GET['updated'] == 'true' ) : ?>
 							<input class="text-input" name="whatsapp" type="text" id="whatsapp" value="<?php  echo $current_user->whatsapp; ?>" />
 
 							<label><i class="fa fa-skype"></i> <?php esc_html_e( 'Skype', 'listeo_core' ); ?></label>
-							<input class="text-input" name="skype" type="text" id="skype" value="<?php  echo $current_user->skype; ?>" /> -->
+							<input class="text-input" name="skype" type="text" id="skype" value="<?php  echo $current_user->skype; ?>" />
 
 
 							<input type="hidden" name="my-account-submission" value="1" />

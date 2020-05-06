@@ -52,7 +52,7 @@ class Listeo_Core_Shortcodes {
 			'custom_class'				=> '',
 			'grid_columns'				=> '2',
 			'in_rows'					=> '',
-			'ajax_browsing'				=> 'on',
+			'ajax_browsing'				=> get_option('listeo_ajax_browsing'),
 			'from_vs'				=> '',
 		) ), $atts ) );
 		  
@@ -84,7 +84,6 @@ class Listeo_Core_Shortcodes {
 			));
 		
 		$get_listings['featured'] = $featured;
-		
 		$listeo_core_query = Listeo_Core_Listing::get_real_listings( apply_filters( 'listeo_core_output_defaults_args', $get_listings ));
 
 		?>
@@ -106,6 +105,7 @@ class Listeo_Core_Shortcodes {
 				'counter'		=> $listeo_core_query->found_posts,
 				'ajax_browsing' => $ajax_browsing,
 				);
+			
 			$search_data = array_merge($style_data,$get_listings);
 			$template_loader->set_template_data( $search_data )->get_template_part( 'listings-start' ); 
 			

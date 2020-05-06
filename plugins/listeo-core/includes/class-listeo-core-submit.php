@@ -258,7 +258,7 @@ class Listeo_Core_Submit  {
 			}
 		}
 		$next_step_key = $this->get_step_key( $this->step );
-
+		
 		// if the step changed, but the next step has no 'view', call the next handler in sequence.
 		if ( $next_step_key && $step_key !== $next_step_key && ! is_callable( $this->steps[ $next_step_key ]['view'] ) ) {
 			$this->process();
@@ -374,24 +374,6 @@ class Listeo_Core_Submit  {
 						
 				),
 			),
-			'cancellation_policy' => array(
-				'title' 	=> __('Cancellation policy','listeo_core'),
-				//'class' 	=> 'margin-top-40',
-				'icon' 		=> 'sl sl-icon-docs',
-				'fields' 	=> array(
-						'_cancellation_policy' => array(
-							'label'       => __( 'Cancellation Policy', 'listeo_core' ),
-							'name'       => '_cancellation_policy',
-							'type'        => 'text',
-							'description' => __( 'Add Cancellation Policy Description .', 'listeo_core' ),
-							'placeholder' => '',
-							'class'		  => '',
-							'priority'    => 1,
-							'required'    => false,
-						),
-				),
-			),
-						
 			'location' =>  array(
 				'title' 	=> __('Location','listeo_core'),
 				//'class' 	=> 'margin-top-40',
@@ -657,6 +639,8 @@ class Listeo_Core_Submit  {
 								'required'    => false,
 								'name'        => '_opening_hours_status',
 						),
+						
+						
 						'_opening_hours' => array(
 							'label'       => __( 'Opening Hours', 'listeo_core' ),
 							'name'       => '_opening_hours',
@@ -783,6 +767,12 @@ class Listeo_Core_Submit  {
 							'priority'    => 9,
 							'render_row_col' => '4'
 						),				
+						'_listing_timezone' => array(
+								'label'       => __( 'Listing Timezone', 'listeo_core' ),
+								'type'        => 'timezone',
+								'required'    => false,
+								'name'        => '_listing_timezone',
+						),
 						
 				),
 			),
@@ -844,7 +834,7 @@ class Listeo_Core_Submit  {
 			),
 			'booking' => array(
 				'title' 	=> __('Booking','listeo_core'),
-				'class' 	=> 'margin-top-40 booking-enable',
+				'class' 	=> 'booking-enable',
 				'onoff'		=> true,
 				//'onoff_state' => 'on',
 				'icon' 		=> 'fa fa-calendar-check-o',
@@ -986,6 +976,20 @@ class Listeo_Core_Submit  {
 						'priority'    => 9,
 						'render_row_col' => '3'
 					),	
+					'_end_hour' => array(
+						'label'       => __( 'Enable End Hour time-picker', 'listeo_core' ),
+						'type'        => 'checkbox',
+						'tooltip'	  => __('If you are not using slots, you can allow guest to set end time for booking by enabling that option ', 'listeo_core'),
+						'required'    => false,
+						
+						'placeholder' => '',
+						'name'        => '_end_hour',
+						'class'		  => '',
+						'priority'    => 10,
+						'priority'    => 9,
+						'render_row_col' => '3',
+						'for_type'	  => 'service'
+					),	
 					'_min_days' => array(
 						'label'       => __( 'Minimum  stay', 'listeo_core' ),
 						'type'        => 'number',
@@ -1037,9 +1041,8 @@ class Listeo_Core_Submit  {
 			),
 
 		);
-		
+
 		$this->fields = apply_filters('submit_listing_form_fields', $this->fields);
-		
 		// get listing type
 		if ( ! $this->listing_type)
 		{
@@ -1218,15 +1221,6 @@ class Listeo_Core_Submit  {
 							'type'        => 'hidden',							
 							'required'    => false,
 						);
-		$this->fields['cancellation_policy']['title']='Cancellation Policy';
-		
-		$this->fields['cancellation_policy']['fields']['_cancellation_policy'] = array(
-							'label'       => __( 'Cancellation Policy', 'listeo_core' ),
-							'name'        => '_cancellation_policy',
-							'type'        => 'wp-editor',							
-							'required'    => false,
-						);
-		
 
 		$this->fields['gallery']['fields']['_thumbnail_id'] = array(
 							'label'       => __( 'Thumbnail ID', 'listeo_core' ),
@@ -1236,13 +1230,6 @@ class Listeo_Core_Submit  {
 							'priority'    => 1,
 							'required'    => false,
 						);
-		
-		
-		$this->fields['details']['fields']['_email_contact_widget']['type']='hidden';
-		$this->fields['details']['fields']['_email_contact_widget']['value']='on'; 
-		$this->fields['menu']['fields']['_menu_status']['type']='hidden';
-		$this->fields['menu']['fields']['_menu_status']['value']='on'; 
-		
 
 		switch ( $this->listing_type) {
 			case 'event':
@@ -1361,6 +1348,7 @@ class Listeo_Core_Submit  {
 	 * Displays the form.
 	 */
 	public function submit() {
+
 		$this->init_fields();
 		$template_loader = new Listeo_Core_Template_Loader;
 		if ( ! is_user_logged_in() ) {
@@ -1370,11 +1358,11 @@ class Listeo_Core_Submit  {
 
 
 		if ( is_user_logged_in() && $this->listing_id ) {
-			
 			$listing = get_post( $this->listing_id );
 			
 			//basic_info/fields/listing_title
 			if($listing){
+
 				foreach ( $this->fields as $group_key => $group_fields ) {
 					foreach ( $group_fields['fields'] as $key => $field ) {
 					
@@ -1447,19 +1435,14 @@ class Listeo_Core_Submit  {
 			}
 			
 		}  elseif ( is_user_logged_in() && empty( $_POST['submit_listing'] ) ) {
-			
 			$this->fields = apply_filters( 'submit_listing_form_fields_get_user_data', $this->fields, get_current_user_id() );
-			
 		}
 		// ini_set('xdebug.var_display_max_depth', '10');
 		// ini_set('xdebug.var_display_max_children', '256');
 		// ini_set('xdebug.var_display_max_data', '1024');
 		// var_dump($this->fields);
-
-
-
-
-	$template_loader->set_template_data( 
+		
+		$template_loader->set_template_data( 
 			array( 
 				'action' 		=> $this->get_action(),
 				'fields' 		=> $this->fields,
@@ -1470,12 +1453,7 @@ class Listeo_Core_Submit  {
 				'submit_button_text' => apply_filters( 'submit_listing_form_submit_button_text', __( 'Preview', 'listeo_core' ) )
 				) 
 			)->get_template_part( 'listing-submit' );
-
-
-		
-		
 		}
-		
 	} 
 	
 
@@ -1513,7 +1491,7 @@ class Listeo_Core_Submit  {
 			
 			// Add or update listing as a WoCommerce product and save product id to values
 		
-				$values['basic_info']['product_id'] = $this -> save_as_product($post_title,$post_content,$product_id);	
+			$values['basic_info']['product_id'] = $this -> save_as_product($post_title,$post_content,$product_id);	
 		
 			
 			$content = '';

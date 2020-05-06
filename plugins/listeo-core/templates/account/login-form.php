@@ -70,15 +70,12 @@
 				<div class="account-type">
 					<div>
 						<input type="radio" name="user_role" id="freelancer-radio" value="guest" class="account-type-radio" checked/>
-						<!--KI 20 02 2020-->
-						<!--<label for="freelancer-radio"><i class="sl sl-icon-user"></i> <?php esc_html_e('Guest','listeo_core') ?></label>-->
-						<label for="freelancer-radio"><!--<i class="sl sl-icon-user"></i>--> Eventy</label>
-						
+						<label for="freelancer-radio"><i class="sl sl-icon-user"></i> <?php esc_html_e('Guest','listeo_core') ?></label>
 					</div>
 
 					<div>
 						<input type="radio" name="user_role" id="employer-radio" value="owner" class="account-type-radio"/>
-						<label for="employer-radio" ><!--<i class="sl sl-icon-briefcase"></i>--> <?php esc_html_e('Owner','listeo_core') ?></label>
+						<label for="employer-radio" ><i class="sl sl-icon-briefcase"></i> <?php esc_html_e('Owner','listeo_core') ?></label>
 					</div>
 				</div>
 				<div class="clearfix"></div>
@@ -159,5 +156,13 @@
 <div class="social-login-separator"><span><?php esc_html_e('Sign In with Social Network','listeo_core'); ?></span></div>
 <?php do_action( 'wordpress_social_login' ); ?>
 
+<?php } ?>
+
+<?php
+if(function_exists('mo_openid_initialize_social_login')) { ?>
+	<div class="social-miniorange-container">
+		<div class="social-login-separator"><span><?php esc_html_e('Sign In with Social Network','listeo_core'); ?></span></div><?php echo do_shortcode( '[miniorange_social_login  view="horizontal" heading=""]' ); 
+		?>
+</div>
 <?php } ?>
 				

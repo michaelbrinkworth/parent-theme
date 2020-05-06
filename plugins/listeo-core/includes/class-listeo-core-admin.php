@@ -172,24 +172,6 @@ class Listeo_Core_Admin {
         add_submenu_page($this->_token . '_settings', 'Pages', 'Pages', 'manage_options', 'listeo_settings&tab=pages',  array( $this, 'settings_page' ) ); 
         
         add_submenu_page($this->_token . '_settings', 'Emails', 'Emails', 'manage_options', 'listeo_settings&tab=emails',  array( $this, 'settings_page' ) ); 
-        
-        add_submenu_page($this->_token . '_settings', 'Users Conversation', 'Users Conversation', 'manage_options', 'user-conversation',  array( $this, 'user_conversation_fun' ) ); 
-
-        add_submenu_page(NULL, 'Single Users Conversation', 'Single Users Conversation', 'manage_options', 'single-user-conversation',  array( $this, 'single_user_conversation_fun' ) ); 
-    }
-
-    /**
-    * Include User Conversation Page
-    */
-    public function user_conversation_fun(){
-        require_once REALTEO_PLUGIN_DIR . '/includes/user_conversation.php';
-    }
-
-    /**
-    * Include Single User Conversation Page
-    */
-    public function single_user_conversation_fun(){
-        require_once REALTEO_PLUGIN_DIR . '/includes/single-user_conversation.php';
     }
 
     /**
@@ -337,8 +319,10 @@ class Listeo_Core_Admin {
                             'date-asc' => esc_html__( 'Oldest Listings', 'listeo_core' ),
                             'date-desc' => esc_html__( 'Newest Listings', 'listeo_core' ),
                             'featured' => esc_html__( 'Featured', 'listeo_core' ),
-                            'price-asc' => esc_html__( 'Price Low to High', 'listeo_core' ),
-                            'price-desc' => esc_html__( 'Price High to Low', 'listeo_core' ),
+                            'highest-rated' => esc_html__( 'Highest Rated', 'listeo_core' ),
+                            'reviewed' => esc_html__( 'Most Reviewed Rated', 'listeo_core' ),
+                           // 'price-asc' => esc_html__( 'Price Low to High', 'listeo_core' ),
+                           // 'price-desc' => esc_html__( 'Price High to Low', 'listeo_core' ),
                             'views' => esc_html__( 'Views', 'listeo_core' ),
                             'rand' => esc_html__( 'Random', 'listeo_core' ),
                         ),
@@ -352,11 +336,25 @@ class Listeo_Core_Admin {
                 ), 
 
                 array(
-                    'label'      => __('Hide owner contact information from not logged in users', 'listeo_core'),
-                    'description'      => __('By enabling this option phone and emails fields will be visible only for logged in users', 'listeo_core'),
+                    'label'      => __('Owner contact information visibility', 'listeo_core'),
+                    'description'      => __('By enabling this option phone and emails fields will be visible only for:', 'listeo_core'),
                     'id'        => 'user_contact_details_visibility',
-                    'type'      => 'checkbox',
+                    'type'      => 'select',
+                    'options'   => array( 
+                            'show_logged' => esc_html__( 'Show owner contact information only for logged in users', 'listeo_core' ),
+                           // 'show_booked' => esc_html__( 'Show owner contact information only after booking', 'listeo_core' ),
+                            'hide_all' => esc_html__( 'Hide all owner contact information', 'listeo_core' ),
+                            'show_all' => esc_html__( 'Always show', 'listeo_core' ),
+                          
+                        ),
+                    'default'   => 'hide_logged'
                 ),  
+                // array(
+                //     'label'      => __('Hide all owner contact information', 'listeo_core'),
+                //     'description'      => __('Hide all options to contact user', 'listeo_core'),
+                //     'id'        => 'user_contact_details_visibility',
+                //     'type'      => 'checkbox',
+                // ),  
 
                
             )
@@ -407,6 +405,7 @@ class Listeo_Core_Admin {
                     'description'   => __( 'Put number between 0-20', 'listeo_core' ),
                     'id'            => 'map_zoom_single', //field id must be unique
                     'type'          => 'text',
+                    'default'       => 9
                 ),
 
                 array(
@@ -643,7 +642,12 @@ class Listeo_Core_Admin {
                     'id'            => 'owners_can_review',
                     'label'         => __( 'Allow owners to add reviews', 'listeo_core' ),
                     'type'          => 'checkbox',
-                ), 
+                ),
+                array(
+                    'id'            => 'reviews_only_booked',
+                    'label'         => __( 'Allow reviewing only to users who made a booking', 'listeo_core' ),
+                    'type'          => 'checkbox',
+                ),
                 array(
                     'id'            => 'review_photos_disable',
                     'label'         => __( 'Disable "Add Photos" option in the review form', 'listeo_core' ),
@@ -669,6 +673,13 @@ class Listeo_Core_Admin {
             'description'           => __( 'Settings related to booking.', 'listeo_core' ),
             'fields'                => array(
                 
+                array(
+                    'id'            => 'remove_guests',
+                    'label'         => __( 'Remove Guests options from all booking widgets', 'listeo_core' ),
+                    'description'   => __( 'Guest picker will be removed from booking widget', 'listeo_core' ),
+                    'type'          => 'checkbox',
+                ),
+
                 array(
                     'id'            => 'owners_can_book',
                     'label'         => __( 'Allow owners to make bookings', 'listeo_core' ),
@@ -845,77 +856,77 @@ class Listeo_Core_Admin {
                     'id'            => 'dashboard_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'Dashboard Page' , 'listeo_core' ),
-                    'description'   => __( 'Main Dashboard page for user', 'listeo_core' ),
+                    'description'   => __( 'Main Dashboard page for user, content: [listeo_dashboard]', 'listeo_core' ),
                     'type'          => 'select',
                 ),
                 array(
                     'id'            => 'messages_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'Messages Page' , 'listeo_core' ),
-                    'description'   => __( 'Main page for user messages', 'listeo_core' ),
+                    'description'   => __( 'Main page for user messages, content: [listeo_messages]', 'listeo_core' ),
                     'type'          => 'select',
                 ),
                 array(
                     'id'            => 'bookings_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'Bookings Page' , 'listeo_core' ),
-                    'description'   => __( 'Page for owners to manage their bookings', 'listeo_core' ),
+                    'description'   => __( 'Page for owners to manage their bookings, content: [listeo_bookings]', 'listeo_core' ),
                     'type'          => 'select',
                 ),  
                 array(
                     'id'            => 'user_bookings_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'My Bookings Page' , 'listeo_core' ),
-                    'description'   => __( 'Page for guest to see their bookings', 'listeo_core' ),
+                    'description'   => __( 'Page for guest to see their bookings,content: [listeo_my_bookings]', 'listeo_core' ),
                     'type'          => 'select',
                 ), 
                 array(
                     'id'            => 'booking_confirmation_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'Booking confirmation' , 'listeo_core' ),
-                    'description'   => __( 'Displays page for booking confirmation', 'listeo_core' ),
+                    'description'   => __( 'Displays page for booking confirmation, content: [listeo_booking_confirmation]', 'listeo_core' ),
                     'type'          => 'select',
                 ), 
                 array(
                     'id'            => 'listings_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'My Listings Page' , 'listeo_core' ),
-                    'description'   => __( 'Displays or listings added by user', 'listeo_core' ),
+                    'description'   => __( 'Displays or listings added by user, content [listeo_my_listings]', 'listeo_core' ),
                     'type'          => 'select',
                 ),    
                 array(
                     'id'            => 'wallet_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'Wallet Page' , 'listeo_core' ),
-                    'description'   => __( 'Displays or owners earnings', 'listeo_core' ),
+                    'description'   => __( 'Displays or owners earnings, content [listeo_wallet]', 'listeo_core' ),
                     'type'          => 'select',
                 ),                
                 array(
                     'id'            => 'reviews_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'Reviews Page' , 'listeo_core' ),
-                    'description'   => __( 'Displays reviews of user properties/o', 'listeo_core' ),
+                    'description'   => __( 'Displays reviews of user listings, content: [listeo_reviews]', 'listeo_core' ),
                     'type'          => 'select',
                 ),                
                 array(
                     'id'            => 'bookmarks_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'Bookmarks Page' , 'listeo_core' ),
-                    'description'   => __( 'Displays user bookmarks', 'listeo_core' ),
+                    'description'   => __( 'Displays user bookmarks, content: [listeo_bookmarks]', 'listeo_core' ),
                     'type'          => 'select',
                 ),
                 array(
                     'id'            => 'submit_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'Submit Listing Page' , 'listeo_core' ),
-                    'description'   => __( 'Displays submit listing page', 'listeo_core' ),
+                    'description'   => __( 'Displays submit listing page, content: [listeo_submit_listing]', 'listeo_core' ),
                     'type'          => 'select',
                 ),                
                 array(
                     'id'            => 'profile_page',
                     'options'       => listeo_core_get_pages_options(),
                     'label'         => __( 'My Profile Page' , 'listeo_core' ),
-                    'description'   => __( 'Displays user profile page', 'listeo_core' ),
+                    'description'   => __( 'Displays user profile page, content: [listeo_my_account]', 'listeo_core' ),
                     'type'          => 'select',
                 ),
                     
@@ -951,6 +962,13 @@ class Listeo_Core_Admin {
                     'label'         => __( 'WooCommerce Subscription Page' , 'listeo_core' ),
                     'description'   => __( 'Displays subscription page in dashboard menu (requires WooCommerce Subscription plugin)', 'listeo_core' ),
                     'type'          => 'checkbox',
+                ),
+                 array(
+                    'id'            => 'ical_page',
+                    'options'       => listeo_core_get_pages_options(),
+                    'label'         => __( 'iCal generator' , 'listeo_core' ),
+                    'description'   => __( 'Used to generate iCal output', 'listeo_core' ),
+                    'type'          => 'select',
                 ),
 
         //         array(
@@ -1365,7 +1383,37 @@ Thank you.
                     'id'        => 'paid_booking_confirmation_email_content',
                     'type'      => 'editor',
                 ),  
-
+                
+                // booking cancelled
+                array(
+                    'label' =>  '',
+                    'description' =>  __('Booking cancelled notification to user ', 'listeo_core'),
+                    'type' => 'title',
+                    'id'   => 'header_booking_cancellation_user'
+                ), 
+                array(
+                    'label'      => __('Enable Booking cancellation notification email', 'listeo_core'),
+                    'description'      => __('Check this checkbox to enable sending emails to user when booking is cancelled', 'listeo_core'),
+                    'id'        => 'booking_user_cancallation_email',
+                    'type'      => 'checkbox',
+                ), 
+                array(
+                    'label'      => __('Booking cancelled notification email subject', 'listeo_core'),
+                    'default'      => __('Your booking request for {listing_name} was cancelled', 'listeo_core'),
+                    'description' => '<br>'.__('Available tags are:').'{user_mail},{user_name},{booking_date},{listing_name},{listing_url},{site_name},{site_url},{dates},{details}',
+                    'id'        => 'booking_user_cancellation_email_subject',
+                    'type'      => 'text',
+                ),
+                 array(
+                    'label'      => __('Booking cancelled notification email content', 'listeo_core'),
+                    'default'      => trim(preg_replace('/\t+/', '', "Hi {user_name},<br>
+                    Your booking '{listing_name}' for {dates} was cancelled.<br>
+                    <br>
+                    Thank you
+                    <br>")),
+                    'id'        => 'booking_user_cancellation_email_content',
+                    'type'      => 'editor',
+                ),   
                
                 /*New message in conversation*/
                 array(

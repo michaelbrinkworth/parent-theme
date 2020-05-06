@@ -2,7 +2,7 @@
 /**
  * Properties Package
  */
-class Listeo_Core_Paid_Properties_Package {
+class Listeo_Core_Paid_Listings_Package {
 	/**
 	 * @var stdClass
 	 */
